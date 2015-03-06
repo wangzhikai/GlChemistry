@@ -10,8 +10,6 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.swing.SwingUtilities;
 
-import net.heteroclinic.glchemistry.gl4.gears.IInstancedRenderingView;
-
 import com.jogamp.newt.event.MouseAdapter;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.WindowAdapter;
