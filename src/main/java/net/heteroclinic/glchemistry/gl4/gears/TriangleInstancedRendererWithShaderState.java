@@ -241,13 +241,13 @@ public class TriangleInstancedRendererWithShaderState implements GLEventListener
 
     	
         ShaderCode vp0 = ShaderCode.create(gl, GL2ES2.GL_VERTEX_SHADER, this.getClass(),
-                "/home/zhikai/Desktop/EclipseWorkspace/JoglMock/src/main/java/shader", "shader/bin", shaderBasename, true);
+                "shaders", "shader/bin", shaderBasename, true);
         
         
 //        ShaderCode fp0 = ShaderCode.create(gl, GL2ES2.GL_FRAGMENT_SHADER, this.getClass(),
 //                "shader", "shader/bin", shaderBasename, true);
         ShaderCode fp0 = ShaderCode.create(gl, GL2ES2.GL_FRAGMENT_SHADER, this.getClass(),
-                "/home/zhikai/Desktop/EclipseWorkspace/JoglMock/src/main/java/shader", "shader/bin", shaderBasename, true);
+                "shaders", "shader/bin", shaderBasename, true);
         vp0.replaceInShaderSource("NO_OF_INSTANCE", String.valueOf(NO_OF_INSTANCE));
 
         vp0.defaultShaderCustomization(gl, true, true);
