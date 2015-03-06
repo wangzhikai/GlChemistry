@@ -34,9 +34,11 @@ public class BareBoneNewt implements IInstancedRenderingView {
 		});
 	}
 
-	public BareBoneNewt(GLEventListener renderer) {
+	public BareBoneNewt(BareBoneRenderer renderer) {
 		//implements GLEventListener 
 		//CuboidRendererWithShaderState renderer = new CuboidRendererWithShaderState(this);
+		if (renderer!= null)
+			renderer.setView(this);
 
 		GLProfile prof = GLProfile.get(GLProfile.GL4);
 		GLCapabilities caps = new GLCapabilities(prof);

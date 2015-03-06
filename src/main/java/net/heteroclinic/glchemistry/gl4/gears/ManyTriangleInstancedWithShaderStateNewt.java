@@ -34,6 +34,8 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.swing.SwingUtilities;
 
+import net.heteroclinic.glchemistry.gl4.IInstancedRenderingView;
+
 import com.jogamp.newt.event.MouseAdapter;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.newt.event.WindowAdapter;

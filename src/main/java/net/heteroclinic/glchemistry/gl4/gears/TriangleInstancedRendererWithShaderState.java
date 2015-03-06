@@ -22,6 +22,9 @@ import javax.media.opengl.TraceGL4;
 //import net.heteroclinic.computergraphics.derivedfromopengl.UnlightedAxis;
 
 
+
+import net.heteroclinic.glchemistry.gl4.IInstancedRenderingView;
+
 import com.jogamp.opengl.math.Matrix4;
 import com.jogamp.opengl.util.GLArrayDataClient;
 import com.jogamp.opengl.util.GLArrayDataServer;

@@ -12,6 +12,7 @@ package net.heteroclinic.glchemistry.gl4;
  */
 import java.awt.Font;
 import java.nio.FloatBuffer;
+import java.util.Random;
 
 import javax.media.opengl.DebugGL4;
 import javax.media.opengl.GL;
@@ -26,12 +27,14 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.GLUniformData;
 import javax.media.opengl.TraceGL4;
 import javax.media.opengl.fixedfunc.GLLightingFunc;
+import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 import javax.swing.SwingUtilities;
 
 import com.jogamp.newt.Window;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.event.awt.AWTKeyAdapter;
+import com.jogamp.opengl.math.Matrix4;
 import com.jogamp.opengl.util.GLArrayDataClient;
 import com.jogamp.opengl.util.GLArrayDataServer;
 import com.jogamp.opengl.util.PMVMatrix;
@@ -151,18 +154,153 @@ public class BareBoneRenderer implements GLEventListener {
 
 	@Override
 	public void dispose(GLAutoDrawable drawable) {
-		
+		GL4 gl = drawable.getGL().getGL4();
+		st.destroy(gl);
+	}
+
+	protected IInstancedRenderingView view;
+	
+	public IInstancedRenderingView getView() {
+		return view;
+	}
+
+	public void setView(IInstancedRenderingView view) {
+		this.view = view;
+	}
+
+	public BareBoneRenderer() {
+		//this.view = view;
+		initTransform();
+	}
+	
+	private void initTransform() {
+		Random rnd = new Random();
+		for(int i = 0; i < NO_OF_INSTANCE; i++) {
+			rotationSpeed[i] = 0.3f * rnd.nextFloat();
+			mat[i] = new Matrix4();
+			mat[i].loadIdentity();
+			float scale = 1f + 4 * rnd.nextFloat();
+			mat[i].scale(scale, scale, scale);
+			//setup initial position of each triangle
+			mat[i].translate(20f * rnd.nextFloat() - 10f,
+							 10f * rnd.nextFloat() -  5f,
+							 0f);
+		}
+	}
+	
+	protected void generateTriangleTransform() {
+		triangleTransform.clear();
+		for(int i = 0; i < NO_OF_INSTANCE; i++) {
+			mat[i].rotate(rotationSpeed[i], 0, 0, 1);
+			triangleTransform.put(mat[i].getMatrix());
+		}
+		triangleTransform.rewind();
 	}
 
 	@Override
 	public void display(GLAutoDrawable drawable) {
+		if(!isInitialized ) return;
+
+		GL4 gl = drawable.getGL().getGL4();
+		gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
+
+		st.useProgram(gl, true);
+		projectionMatrix.glMatrixMode(GL2.GL_PROJECTION);
+		projectionMatrix.glPushMatrix();
+
+		float winScale = 0.1f;
+		if(view != null) winScale = view.getScale();
+		projectionMatrix.glScalef(winScale, winScale, winScale);
+		projectionMatrix.update();
+		st.uniform(gl, projectionMatrixUniform);
+		projectionMatrix.glPopMatrix();
+
+		generateTriangleTransform();
+		
+		st.uniform(gl, transformMatrixUniform);
+		if(useInterleaved) {
+			interleavedVBO.enableBuffer(gl, true);
+		} else {
+			verticesVBO.enableBuffer(gl, true);
+			colorsVBO.enableBuffer(gl, true);
+		}
+		//gl.glVertexAttribDivisor() is not required since each instance has the same attribute (color).
+		gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
+		if(useInterleaved) {
+			interleavedVBO.enableBuffer(gl, false);
+		} else {
+			verticesVBO.enableBuffer(gl, false);
+			colorsVBO.enableBuffer(gl, false);
+		}
+		//UnlightedAxis.draw(gl);
+		st.useProgram(gl, false); 
+		
+		/* An old GL2 Implementation
+		GL2 gl = drawable.getGL().getGL2();
+		if (GLProfile.isAWTAvailable()
+				&& (drawable instanceof javax.media.opengl.awt.GLJPanel)
+				&& !((javax.media.opengl.awt.GLJPanel) drawable).isOpaque()
+				&& ((javax.media.opengl.awt.GLJPanel) drawable)
+						.shouldPreserveColorBufferIfTranslucent()) {
+			gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
+		} else {
+			gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		}
+
+		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glDepthFunc(GL.GL_LEQUAL);
+		gl.glEnable(GL.GL_CULL_FACE);
+		gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
+		gl.glCullFace(GL.GL_FRONT);
+		gl.glFrontFace(GL.GL_CCW);
+
+		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
+		gl.glLoadIdentity();
+
+		this.glcamera.applyProjection(gl, glu);
+		// gl.glOrtho(-orthoganal_clip_size, orthoganal_clip_size,
+		// -orthoganal_clip_size2, orthoganal_clip_size2, NEAR_Z, FAR_Z);
+		gl.glScalef(scale, scale, scale);
+
+		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
+		gl.glLoadIdentity();
+		// glu.gluLookAt(eyex, eyey, eyez, lookatx, lookaty, lookatz, 0, 1, 0);
+
+		this.glcamera.applyLookat(glu);
+		gl.glEnable(GLLightingFunc.GL_LIGHTING);
+		
+		// //test case I
+		// //DrawableCollection.getInstance().draw(drawable);
+		// MathVector3 v = new MathVector3(0f,1f,0f);
+		// System.out.println("v:"+v);
+		// MathVector3 w = new MathVector3(1f,0f,0f);
+		// System.out.println("w:"+w);
+		// System.out.println("w':"+
+		// GLOrientation.rotateAboutAVector(drawable,
+		// v, w, 90f)
+		// );
+		// //test case I
+		UnlightedAxis.draw(gl);
+		*/
 		
 	}
+	
+	protected float aspect;
+
 
 	@Override
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
-		
+		GL4 gl3 = drawable.getGL().getGL4();
+		gl3.glViewport(0, 0, width, height);
+		aspect = (float) width / (float) height;
+
+		projectionMatrix.glMatrixMode(GL2.GL_PROJECTION);
+		projectionMatrix.glLoadIdentity();
+		projectionMatrix.gluPerspective(45, aspect, 0.001f, 20f);
+		projectionMatrix.gluLookAt(0, 0, -10, 0, 0, 0, 0, 1, 0);
 	}
 	
 	protected GLArrayDataServer interleavedVBO;
@@ -223,6 +361,10 @@ public class BareBoneRenderer implements GLEventListener {
 	protected static final String shaderBasename = "triangles";
 	protected ShaderState st;
 	protected static final int NO_OF_INSTANCE = 1;
+	//protected final FloatBuffer triangleTransform = FloatBuffer.allocate(16 * NO_OF_INSTANCE);
+	protected final Matrix4[] mat = new Matrix4[NO_OF_INSTANCE];
+	protected final float[] rotationSpeed = new float[NO_OF_INSTANCE];
+	
 	protected void initShader(GL4 gl) {
 //        public static ShaderCode create(final GL2ES2 gl, final int type, final Class<?> context,
 //                final String srcRoot, final String binRoot, final String basename, final boolean mutableStringBuilder) {
