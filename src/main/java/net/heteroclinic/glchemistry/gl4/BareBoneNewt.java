@@ -34,7 +34,7 @@ public class BareBoneNewt implements IInstancedRenderingView {
 		});
 	}
 
-	public BareBoneNewt(BareBoneRenderer renderer) {
+	public BareBoneNewt(Renderer renderer) {
 		//implements GLEventListener 
 		//CuboidRendererWithShaderState renderer = new CuboidRendererWithShaderState(this);
 		if (renderer!= null)

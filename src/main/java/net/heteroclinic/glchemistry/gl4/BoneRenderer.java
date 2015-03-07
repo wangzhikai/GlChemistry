@@ -54,13 +54,13 @@ import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
 import com.jogamp.opengl.util.glsl.ShaderState;
 
-public class BareBoneRenderer extends Renderer {
+public class BoneRenderer extends Renderer {
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new BareBoneNewt(new BareBoneRenderer());
+				new BareBoneNewt(new BoneRenderer());
 			}
 		});
 	}
@@ -180,7 +180,7 @@ public class BareBoneRenderer extends Renderer {
 		this.view = view;
 	}
 
-	public BareBoneRenderer() {
+	public BoneRenderer() {
 		//this.view = view;
 		initTransform();
 	}
