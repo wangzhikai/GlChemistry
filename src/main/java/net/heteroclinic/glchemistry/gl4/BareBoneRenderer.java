@@ -6,9 +6,19 @@
 package net.heteroclinic.glchemistry.gl4;
 
 /*
+ * NOTE:
+ * 1. The pipeline now are only projection, transformation
+ * 2. Use the Uniform stuff to share stuff main MEM and GPU
+ * 
  * QUESTIONS AND TODOS
- * TODO 1. How NO_OF_INSTANCE matters?
+ * TO-DO 1. Remove the randomness, not necessary
+ * TODO 1+1 Draw static axis
+ * TODO 1+1.1 Draw a rectangle bar
+ * TODO 2. Change projection matrix, from perspective to 
+ * TODO 3. how reshape affects projection
+ * TODO 4. How NO_OF_INSTANCE matters? 
  * vp0.replaceInShaderSource("NO_OF_INSTANCE", String.valueOf(NO_OF_INSTANCE));
+ * Looks like each VBO would have a mat queued into the projection each and transform each?
  */
 import java.awt.Font;
 import java.nio.FloatBuffer;
@@ -173,7 +183,7 @@ public class BareBoneRenderer implements GLEventListener {
 		initTransform();
 	}
 	
-	private void initTransform() {
+	protected void initTransform() {
 		Random rnd = new Random();
 		for(int i = 0; i < NO_OF_INSTANCE; i++) {
 			rotationSpeed[i] = 0.3f * rnd.nextFloat();
@@ -182,9 +192,7 @@ public class BareBoneRenderer implements GLEventListener {
 			float scale = 1f + 4 * rnd.nextFloat();
 			mat[i].scale(scale, scale, scale);
 			//setup initial position of each triangle
-			mat[i].translate(20f * rnd.nextFloat() - 10f,
-							 10f * rnd.nextFloat() -  5f,
-							 0f);
+			//mat[i].translate(20f * rnd.nextFloat() - 10f,10f * rnd.nextFloat() -  5f,0f);
 		}
 	}
 	
@@ -208,7 +216,7 @@ public class BareBoneRenderer implements GLEventListener {
 		projectionMatrix.glMatrixMode(GL2.GL_PROJECTION);
 		projectionMatrix.glPushMatrix();
 
-		float winScale = 0.1f;
+		float winScale = 1.0f;
 		if(view != null) winScale = view.getScale();
 		projectionMatrix.glScalef(winScale, winScale, winScale);
 		projectionMatrix.update();
