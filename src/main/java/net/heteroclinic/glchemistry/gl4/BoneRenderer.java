@@ -344,7 +344,7 @@ public class BoneRenderer extends Renderer {
 	protected GLArrayDataClient colorsVBO;
 	
 	protected static final float[] vertices = {
-		1.0f, 0.0f, 0,
+		3.0f, 0.0f, 0,
 		-0.5f, 0.866f, 0,
 		-0.5f, -0.866f, 0,
 		1.0f, -0.866f*2.0f, 0

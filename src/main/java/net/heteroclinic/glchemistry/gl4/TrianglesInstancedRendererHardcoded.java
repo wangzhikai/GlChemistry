@@ -48,6 +48,9 @@ public class TrianglesInstancedRendererHardcoded extends Renderer {
 
 	private int[] vbo;
 	private int[] vao;
+	private int[] vbo2;
+	private int[] vao2;
+
 	private PrintStream stream;
 	//private final IInstancedRenderingView view;
 
@@ -118,6 +121,12 @@ public class TrianglesInstancedRendererHardcoded extends Renderer {
 		gl.glBindVertexArray(vao[0]);
 		gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
 		gl.glBindVertexArray(0);
+		
+		gl.glBindVertexArray(vao2[0]);
+		gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
+		gl.glBindVertexArray(0);
+
+		
 		gl.glUseProgram(0);
 	}
 
@@ -163,31 +172,60 @@ public class TrianglesInstancedRendererHardcoded extends Renderer {
 	}
 
 	private void initVBO(GL4 gl) {
-		FloatBuffer interleavedBuffer = Buffers.newDirectFloatBuffer(vertices.length + colors.length);
-		for(int i = 0; i < vertices.length/3; i++) {
-			for(int j = 0; j < 3; j++) {
-				interleavedBuffer.put(vertices[i*3 + j]);
+		{
+			FloatBuffer interleavedBuffer = Buffers.newDirectFloatBuffer(vertices.length + colors.length);
+			for(int i = 0; i < vertices.length/3; i++) {
+				for(int j = 0; j < 3; j++) {
+					interleavedBuffer.put(vertices[i*3 + j]);
+				}
+				for(int j = 0; j < 4; j++) {
+					interleavedBuffer.put(colors[i*4 + j]);
+				}
 			}
-			for(int j = 0; j < 4; j++) {
-				interleavedBuffer.put(colors[i*4 + j]);
-			}
+			interleavedBuffer.flip();
+	
+			vao = new int[1];
+			gl.glGenVertexArrays(1, vao , 0);
+			gl.glBindVertexArray(vao[0]);
+			vbo = new int[1];
+			gl.glGenBuffers(1, vbo, 0);
+			gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, vbo[0]);
+			gl.glBufferData(GL4.GL_ARRAY_BUFFER, interleavedBuffer.limit() * Buffers.SIZEOF_FLOAT, interleavedBuffer, GL4.GL_STATIC_DRAW);
+	
+			gl.glEnableVertexAttribArray(locPos);
+			gl.glEnableVertexAttribArray(locCol);
+	
+			int stride = Buffers.SIZEOF_FLOAT * (3+4);
+			gl.glVertexAttribPointer( locPos, 3, GL4.GL_FLOAT, false, stride, 0);
+			gl.glVertexAttribPointer( locCol, 4, GL4.GL_FLOAT, false, stride, Buffers.SIZEOF_FLOAT * 3);
 		}
-		interleavedBuffer.flip();
-
-		vao = new int[1];
-		gl.glGenVertexArrays(1, vao , 0);
-		gl.glBindVertexArray(vao[0]);
-		vbo = new int[1];
-		gl.glGenBuffers(1, vbo, 0);
-		gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, vbo[0]);
-		gl.glBufferData(GL4.GL_ARRAY_BUFFER, interleavedBuffer.limit() * Buffers.SIZEOF_FLOAT, interleavedBuffer, GL4.GL_STATIC_DRAW);
-
-		gl.glEnableVertexAttribArray(locPos);
-		gl.glEnableVertexAttribArray(locCol);
-
-		int stride = Buffers.SIZEOF_FLOAT * (3+4);
-		gl.glVertexAttribPointer( locPos, 3, GL4.GL_FLOAT, false, stride, 0);
-		gl.glVertexAttribPointer( locCol, 4, GL4.GL_FLOAT, false, stride, Buffers.SIZEOF_FLOAT * 3);
+		{
+			FloatBuffer interleavedBuffer = Buffers.newDirectFloatBuffer(vertices.length + colors.length);
+			for(int i = 0; i < vertices.length/3; i++) {
+				for(int j = 0; j < 3; j++) {
+					interleavedBuffer.put(vertices2[i*3 + j]);
+				}
+				for(int j = 0; j < 4; j++) {
+					interleavedBuffer.put(colors[i*4 + j]);
+				}
+			}
+			interleavedBuffer.flip();
+	
+			vao2 = new int[1];
+			gl.glGenVertexArrays(1, vao2 , 0);
+			gl.glBindVertexArray(vao2[0]);
+			vbo2 = new int[1];
+			gl.glGenBuffers(1, vbo2, 0);
+			gl.glBindBuffer(GL4.GL_ARRAY_BUFFER, vbo[0]);
+			gl.glBufferData(GL4.GL_ARRAY_BUFFER, interleavedBuffer.limit() * Buffers.SIZEOF_FLOAT, interleavedBuffer, GL4.GL_STATIC_DRAW);
+	
+			gl.glEnableVertexAttribArray(locPos);
+			gl.glEnableVertexAttribArray(locCol);
+	
+			int stride = Buffers.SIZEOF_FLOAT * (3+4);
+			gl.glVertexAttribPointer( locPos, 3, GL4.GL_FLOAT, false, stride, 0);
+			gl.glVertexAttribPointer( locCol, 4, GL4.GL_FLOAT, false, stride, Buffers.SIZEOF_FLOAT * 3);
+		}
 	}
 
 	private void initShaders(GL4 gl) throws IOException {
@@ -288,7 +326,12 @@ public class TrianglesInstancedRendererHardcoded extends Renderer {
 			-0.5f, 0.866f, 0,
 			-0.5f, -0.866f, 0
 	};
-
+	private final float[] vertices2 = {
+			2.0f, 0.0f, 0,
+			1.5f, 0.866f, 0,
+			1.5f, -0.866f, 0
+	};
+	
 	private final float[] colors = {
 			1.0f, 0.0f, 0.0f, 1.0f,
 			0.0f, 1.0f, 0.0f, 1.0f,
