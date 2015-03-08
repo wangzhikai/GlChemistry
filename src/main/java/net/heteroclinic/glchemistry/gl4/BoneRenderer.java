@@ -12,8 +12,10 @@ package net.heteroclinic.glchemistry.gl4;
  * 
  * QUESTIONS AND TODOS
  * TO-DO 1. Remove the randomness, not necessary
+ * TODO Draw rectangle by modify vertices
+ * TODO Draw two triangles using two VBO
  * TODO 1+1 Draw static axis
- * TODO 1+1.1 Draw a rectangle bar
+ * TO-DO Give up. Not found ((GL2) gl).glBegin(GL2.GL_POLYGON); 1+1.1 Draw a rectangle bar
  * TODO 2. Change projection matrix, from perspective to 
  * TODO 3. how reshape affects projection
  * TODO 4. How NO_OF_INSTANCE matters? 
@@ -201,7 +203,7 @@ public class BoneRenderer extends Renderer {
 	protected void generateTriangleTransform() {
 		triangleTransform.clear();
 		for(int i = 0; i < NO_OF_INSTANCE; i++) {
-			mat[i].rotate(rotationSpeed[i], 0, 0, 1);
+			//mat[i].rotate(rotationSpeed[i], 0, 0, 1);
 			triangleTransform.put(mat[i].getMatrix());
 		}
 		triangleTransform.rewind();
@@ -236,7 +238,9 @@ public class BoneRenderer extends Renderer {
 			colorsVBO.enableBuffer(gl, true);
 		}
 		//gl.glVertexAttribDivisor() is not required since each instance has the same attribute (color).
-		gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
+		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
+		gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 4, NO_OF_INSTANCE);
+		
 		if(useInterleaved) {
 			interleavedVBO.enableBuffer(gl, false);
 		} else {
@@ -342,16 +346,19 @@ public class BoneRenderer extends Renderer {
 	protected static final float[] vertices = {
 		1.0f, 0.0f, 0,
 		-0.5f, 0.866f, 0,
-		-0.5f, -0.866f, 0
+		-0.5f, -0.866f, 0,
+		1.0f, -0.866f*2.0f, 0
+
 	};
 	
 	protected final float[] colors = {
 			1.0f, 0.0f, 0.0f, 1.0f,
 			0.0f, 1.0f, 0.0f, 1.0f,
-			0f, 0f, 1.0f, 1f
+			0f, 0f, 1.0f, 1f,
+			0.0f, 1.0f, 0.0f, 1.0f,
 	};
 	protected void initVBO_nonInterleaved(GL4 gl) {
-		int VERTEX_COUNT = 3;
+		int VERTEX_COUNT = 4;
 
         verticesVBO = GLArrayDataClient.createGLSL("mgl_Vertex", 3, GL4.GL_FLOAT, false, VERTEX_COUNT);
         FloatBuffer verticeBuf = (FloatBuffer)verticesVBO.getBuffer();
@@ -373,7 +380,7 @@ public class BoneRenderer extends Renderer {
 
 
 	protected void initVBO_interleaved(GL4 gl) {
-		int VERTEX_COUNT = 3;
+		int VERTEX_COUNT = 4;
 		interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, VERTEX_COUNT, GL.GL_STATIC_DRAW);
         interleavedVBO.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
         interleavedVBO.addGLSLSubArray("mgl_Color",  4, GL.GL_ARRAY_BUFFER);

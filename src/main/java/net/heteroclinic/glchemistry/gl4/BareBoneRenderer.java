@@ -6,19 +6,7 @@
 package net.heteroclinic.glchemistry.gl4;
 
 /*
- * NOTE:
- * 1. The pipeline now are only projection, transformation
- * 2. Use the Uniform stuff to share stuff main MEM and GPU
- * 
- * QUESTIONS AND TODOS
- * TO-DO 1. Remove the randomness, not necessary
- * TODO 1+1 Draw static axis
- * TODO 1+1.1 Draw a rectangle bar
- * TODO 2. Change projection matrix, from perspective to 
- * TODO 3. how reshape affects projection
- * TODO 4. How NO_OF_INSTANCE matters? 
- * vp0.replaceInShaderSource("NO_OF_INSTANCE", String.valueOf(NO_OF_INSTANCE));
- * Looks like each VBO would have a mat queued into the projection each and transform each?
+ * 20150305 Move working file to BoneRenderer
  */
 import java.awt.Font;
 import java.nio.FloatBuffer;
