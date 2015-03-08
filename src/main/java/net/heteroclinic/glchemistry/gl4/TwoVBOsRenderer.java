@@ -2,28 +2,15 @@
  * @author Zhikai Wang
  * www.heteroclinic.net
  * Please read the accompanying LICENSE
-  * NOTE:
- * 1. The pipeline now are only projection, transformation
- * 2. Use the Uniform stuff to share stuff between main MEM and GPU
  * 
- * QUESTIONS AND TODOS
- * TO-DO Remove the randomness, not necessary
- * TO-DO Draw TRIANGLE_STRIP by modify vertices
- * TODO Draw two strips using two VBO
- * TODO Port Gear as vertices
- * TODO Load the manual plot of gear triangulization.
- * TODO 1+1 Draw static axis
- * TO-DO Give up. Not found ((GL2) gl).glBegin(GL2.GL_POLYGON); 1+1.1 Draw a rectangle bar
- * TODO 2. Change projection matrix, from perspective to 
- * TODO 3. how reshape affects projection
- * TODO 4. How NO_OF_INSTANCE matters? 
- * vp0.replaceInShaderSource("NO_OF_INSTANCE", String.valueOf(NO_OF_INSTANCE));
- * Looks like each VBO would have a mat queued into the projection each and transform each?
- * TODO scale is a bad idea, it deforms the normals of a plane. 
-			mat[i].scale(scale, scale, scale);
-	    Scale should be achieved by camera zoom in/out. 
-	    Or scale the model and recalculate the normals of each planar surface/vertices.
-   TODO How different VBOs use the uniform transformation
+ * We use this class to figure out the way to render two VBOs.
+ * Notes:
+ * 1. Create vertices, colors for each VBO
+ * 2. Initialize the vbos, "mgl_Vertex" and "mgl_Color" are literals that have according meaning.
+ *    You CAN NOT change them.
+ * 	        interleavedVBO.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
+	        interleavedVBO.addGLSLSubArray("mgl_Color",  4, GL.GL_ARRAY_BUFFER);
+   3. In the display function, render each vbo once 
  */
 package net.heteroclinic.glchemistry.gl4;
 
@@ -47,13 +34,13 @@ import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
 import com.jogamp.opengl.util.glsl.ShaderState;
 
-public class BoneRenderer extends Renderer {
+public class TwoVBOsRenderer extends Renderer {
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new BareBoneNewt(new BoneRenderer());
+				new BareBoneNewt(new TwoVBOsRenderer());
 			}
 		});
 	}
@@ -105,55 +92,8 @@ public class BoneRenderer extends Renderer {
         } else {
         	initVBO_nonInterleaved(gl);
         }
-        
-        
 
 		isInitialized = true;
-
-		/* GL2 implementation
-		System.out.println("SimpleFloatingOPsGLEventListener init called");
-		GL2 gl = drawable.getGL().getGL2();
-		glu = new GLU();
-		glut = new GLUT();
-		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		((GLLightingFunc) gl).glShadeModel(GLLightingFunc.GL_SMOOTH);
-		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glDisable(GL.GL_CULL_FACE);
-		((GL2) gl).glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE);
-		float ambient[] = { 0.2f, 0.2f, 0.2f, 1 };
-		float position[] = { 1.0f, 10.0f, 5.7f, 1 };
-		float intensity[] = { 1, 1, 1, 1 };
-		float specColor[] = { 1, 1, 1, 1 };
-
-		gl.glEnable(GLLightingFunc.GL_LIGHTING);
-		((GL2ES1) gl).glLightModelfv(GLLightingFunc.GL_AMBIENT, ambient, 0);
-		gl.glEnable(GLLightingFunc.GL_LIGHT0);
-		((GLLightingFunc) gl).glLightfv(GLLightingFunc.GL_LIGHT0,
-				GLLightingFunc.GL_POSITION, position, 0);
-		((GLLightingFunc) gl).glLightfv(GLLightingFunc.GL_LIGHT0,
-				GLLightingFunc.GL_DIFFUSE, intensity, 0);
-		((GLLightingFunc) gl).glLightfv(GLLightingFunc.GL_LIGHT0,
-				GLLightingFunc.GL_SPECULAR, specColor, 0);
-
-		gl.glEnable(GLLightingFunc.GL_COLOR_MATERIAL);
-		((GL) gl).glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-		hints_renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 16));
-		hints_renderer.setColor(0f, 0f, 0f, 1.0f);
-		
-		glcamera.glinit(drawable);
-
-		KeyListener floatingopesKeys = new FloatingOPsKeyAdapter();
-	    if (drawable instanceof Window) {
-				        Window window = (Window) drawable;
-				        //window.addMouseListener(gearsMouse);
-				        window.addKeyListener(floatingopesKeys);
-				    } else if (GLProfile.isAWTAvailable() && drawable instanceof java.awt.Component) {
-				        java.awt.Component comp = (java.awt.Component) drawable;
-				        //new AWTMouseAdapter(gearsMouse, drawable).addTo(comp);
-				        new AWTKeyAdapter(floatingopesKeys, drawable).addTo(comp);
-	    }
-	    */
 		
 	}
 
@@ -173,7 +113,7 @@ public class BoneRenderer extends Renderer {
 		this.view = view;
 	}
 
-	public BoneRenderer() {
+	public TwoVBOsRenderer() {
 		//this.view = view;
 		initTransform();
 	}
@@ -229,12 +169,7 @@ public class BoneRenderer extends Renderer {
 			verticesVBO.enableBuffer(gl, true);
 			colorsVBO.enableBuffer(gl, true);
 		}
-		//gl.glVertexAttribDivisor() is not required since each instance has the same attribute (color).
-		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
-		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
 		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
-		//gl.glVertexAttribDivisor();
-		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 2, 4, NO_OF_INSTANCE);
 		
 		if(useInterleaved) {
 			interleavedVBO.enableBuffer(gl, false);
@@ -244,7 +179,7 @@ public class BoneRenderer extends Renderer {
 		}
 
 		
-		// TODO Try to draw the second VBO
+		// Try to draw the second VBO
 		st.uniform(gl, transformMatrixUniform);
 		if(useInterleaved) {
 			interleavedVBO_2.enableBuffer(gl, true);
@@ -252,12 +187,7 @@ public class BoneRenderer extends Renderer {
 			verticesVBO_2.enableBuffer(gl, true);
 			colorsVBO_2.enableBuffer(gl, true);
 		}
-		//gl.glVertexAttribDivisor() is not required since each instance has the same attribute (color).
-		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
-		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
 		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
-		//gl.glVertexAttribDivisor();
-		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 2, 4, NO_OF_INSTANCE);
 		
 		if(useInterleaved) {
 			interleavedVBO_2.enableBuffer(gl, false);
@@ -266,60 +196,8 @@ public class BoneRenderer extends Renderer {
 			colorsVBO_2.enableBuffer(gl, false);
 		}
 		st.useProgram(gl, false); 
-	
-		
 		// END Try to draw the second VBO
-		
-		/* An old GL2 Implementation
-		GL2 gl = drawable.getGL().getGL2();
-		if (GLProfile.isAWTAvailable()
-				&& (drawable instanceof javax.media.opengl.awt.GLJPanel)
-				&& !((javax.media.opengl.awt.GLJPanel) drawable).isOpaque()
-				&& ((javax.media.opengl.awt.GLJPanel) drawable)
-						.shouldPreserveColorBufferIfTranslucent()) {
-			gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
-		} else {
-			gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-		}
 
-		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-		gl.glEnable(GL.GL_DEPTH_TEST);
-		gl.glDepthFunc(GL.GL_LEQUAL);
-		gl.glEnable(GL.GL_CULL_FACE);
-		gl.glShadeModel(GLLightingFunc.GL_SMOOTH);
-		gl.glCullFace(GL.GL_FRONT);
-		gl.glFrontFace(GL.GL_CCW);
-
-		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
-		gl.glLoadIdentity();
-
-		this.glcamera.applyProjection(gl, glu);
-		// gl.glOrtho(-orthoganal_clip_size, orthoganal_clip_size,
-		// -orthoganal_clip_size2, orthoganal_clip_size2, NEAR_Z, FAR_Z);
-		gl.glScalef(scale, scale, scale);
-
-		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
-		gl.glLoadIdentity();
-		// glu.gluLookAt(eyex, eyey, eyez, lookatx, lookaty, lookatz, 0, 1, 0);
-
-		this.glcamera.applyLookat(glu);
-		gl.glEnable(GLLightingFunc.GL_LIGHTING);
-		
-		// //test case I
-		// //DrawableCollection.getInstance().draw(drawable);
-		// MathVector3 v = new MathVector3(0f,1f,0f);
-		// System.out.println("v:"+v);
-		// MathVector3 w = new MathVector3(1f,0f,0f);
-		// System.out.println("w:"+w);
-		// System.out.println("w':"+
-		// GLOrientation.rotateAboutAVector(drawable,
-		// v, w, 90f)
-		// );
-		// //test case I
-		UnlightedAxis.draw(gl);
-		*/
-		
 	}
 	
 	protected float aspect;
@@ -493,36 +371,5 @@ public class BoneRenderer extends Renderer {
         st = new ShaderState();
         st.attachShaderProgram(gl, sp, true);
     }
-/* My old GL2 camera code
-	public void glinit ( GLAutoDrawable drawable) {
-		if (glinited )
-			return;
-		else {
-			MathVector3 viewvector_negative = MathVector3.minus(this.global_position,this.lookat);
-			if (viewvector_negative.norm2() < safe_lookat_radius) {
-				throw new IllegalArgumentException ("The lookat point is inside the safe lookat radius.");
-			}
-			
-			if (MathConstants.isAlmost(viewvector_negative.normalizeZeroifZero(),0f)) {
-				throw new IllegalArgumentException ("The lookat point and camera position overlapped.");
-			}
-			MathVector3 ref = MathVector3.cross(viewvector_negative, GLOrientation.y_positive);
-			if (MathConstants.isAlmost(ref.normalizeZeroifZero(),0f)) {
-				throw new IllegalArgumentException ("The view vector is near north pole.");
-			}
-			float a = MathVector3.angleBetweenVW(viewvector_negative,GLOrientation.y_positive, ref);
-			//System.out.println("a in SimpleGLCamera=" + a);
-			if ( a< north_pole_restricted_angle || a > (180f - north_pole_restricted_angle))
-				throw new IllegalArgumentException ("The view vector is near north pole.");
-			MathVector3 viewvector = MathVector3.minus(this.lookat,this.global_position);
-			//this.pinByAVectorAndKeepUpOrthogonal(drawable, viewvector);
-			this.pinAPointAndKeepUpOrthogonal(drawable, this.lookat);
-			 updateGetLookat_radius();
-			
-			// Orientation change 
-		}
-		 glinited = true;
-	}
- */
 
 }

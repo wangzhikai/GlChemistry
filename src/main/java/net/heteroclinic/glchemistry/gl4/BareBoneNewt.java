@@ -6,7 +6,6 @@
 package net.heteroclinic.glchemistry.gl4;
 
 import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.swing.SwingUtilities;
 

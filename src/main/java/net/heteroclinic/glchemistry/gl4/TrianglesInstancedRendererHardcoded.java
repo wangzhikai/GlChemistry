@@ -16,7 +16,6 @@ import javax.media.opengl.DebugGL4;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GL4;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
 import javax.media.opengl.TraceGL4;
 import javax.swing.SwingUtilities;
 

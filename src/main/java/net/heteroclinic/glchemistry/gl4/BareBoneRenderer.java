@@ -5,39 +5,22 @@
  */
 package net.heteroclinic.glchemistry.gl4;
 
-/*
- * 20150305 Move working file to BoneRenderer
- */
-import java.awt.Font;
 import java.nio.FloatBuffer;
 import java.util.Random;
 
-import javax.media.opengl.DebugGL4;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.GL2ES1;
 import javax.media.opengl.GL2ES2;
 import javax.media.opengl.GL4;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
-import javax.media.opengl.GLProfile;
 import javax.media.opengl.GLUniformData;
-import javax.media.opengl.TraceGL4;
-import javax.media.opengl.fixedfunc.GLLightingFunc;
-import javax.media.opengl.fixedfunc.GLMatrixFunc;
-import javax.media.opengl.glu.GLU;
 import javax.swing.SwingUtilities;
 
-import com.jogamp.newt.Window;
-import com.jogamp.newt.event.KeyListener;
-import com.jogamp.newt.event.awt.AWTKeyAdapter;
 import com.jogamp.opengl.math.Matrix4;
 import com.jogamp.opengl.util.GLArrayDataClient;
 import com.jogamp.opengl.util.GLArrayDataServer;
 import com.jogamp.opengl.util.PMVMatrix;
-import com.jogamp.opengl.util.awt.TextRenderer;
-import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
 import com.jogamp.opengl.util.glsl.ShaderState;
