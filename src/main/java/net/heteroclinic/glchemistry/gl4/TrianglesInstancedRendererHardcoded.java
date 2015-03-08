@@ -1,3 +1,6 @@
+/**
+ * 20150508 This file is trying another way to render VBO, currently draw two VBOs not work. Save as a intermediate state reference.
+ */
 package net.heteroclinic.glchemistry.gl4;
 
 //package com.jogamp.opengl.test.junit.jogl.demos.gl4;
@@ -41,7 +44,7 @@ public class TrianglesInstancedRendererHardcoded extends Renderer {
 	private static final int locCol = 2;
 	private PMVMatrix projectionMatrix;
 
-	private static final int NO_OF_INSTANCE = 30;
+	private static final int NO_OF_INSTANCE = 1;
 	private final FloatBuffer triangleTransform = FloatBuffer.allocate(16 * NO_OF_INSTANCE);
 	private final Matrix4[] mat = new Matrix4[NO_OF_INSTANCE];
 	private final float[] rotationSpeed = new float[NO_OF_INSTANCE];

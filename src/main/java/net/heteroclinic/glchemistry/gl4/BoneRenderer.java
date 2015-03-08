@@ -239,7 +239,9 @@ public class BoneRenderer extends Renderer {
 		}
 		//gl.glVertexAttribDivisor() is not required since each instance has the same attribute (color).
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
-		gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 4, NO_OF_INSTANCE);
+		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
+		//gl.glVertexAttribDivisor();
+		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 2, 4, NO_OF_INSTANCE);
 		
 		if(useInterleaved) {
 			interleavedVBO.enableBuffer(gl, false);
@@ -248,7 +250,8 @@ public class BoneRenderer extends Renderer {
 			colorsVBO.enableBuffer(gl, false);
 		}
 		//UnlightedAxis.draw(gl);
-		
+	
+		/*
 		//TO-DO see if we can draw twice YES
 		st.uniform(gl, transformMatrixUniform);
 		
@@ -268,6 +271,7 @@ public class BoneRenderer extends Renderer {
 		}
 		
 		//END see if we can draw twice
+		*/
 		
 		st.useProgram(gl, false); 
 		
@@ -347,8 +351,8 @@ public class BoneRenderer extends Renderer {
 		3.0f, 0.0f, 0,
 		-0.5f, 0.866f, 0,
 		-0.5f, -0.866f, 0,
-		1.0f, -0.866f*2.0f, 0
-
+		-3.0f, 0f, 0,
+		-3.0f, -0.866f*2f, 0
 	};
 	
 	protected final float[] colors = {
@@ -356,9 +360,10 @@ public class BoneRenderer extends Renderer {
 			0.0f, 1.0f, 0.0f, 1.0f,
 			0f, 0f, 1.0f, 1f,
 			0.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1.0f
 	};
 	protected void initVBO_nonInterleaved(GL4 gl) {
-		int VERTEX_COUNT = 4;
+		int VERTEX_COUNT = 5;
 
         verticesVBO = GLArrayDataClient.createGLSL("mgl_Vertex", 3, GL4.GL_FLOAT, false, VERTEX_COUNT);
         FloatBuffer verticeBuf = (FloatBuffer)verticesVBO.getBuffer();
@@ -380,7 +385,7 @@ public class BoneRenderer extends Renderer {
 
 
 	protected void initVBO_interleaved(GL4 gl) {
-		int VERTEX_COUNT = 4;
+		int VERTEX_COUNT = 5;
 		interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, VERTEX_COUNT, GL.GL_STATIC_DRAW);
         interleavedVBO.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
         interleavedVBO.addGLSLSubArray("mgl_Color",  4, GL.GL_ARRAY_BUFFER);
