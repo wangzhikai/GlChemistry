@@ -3,7 +3,21 @@
  * www.heteroclinic.net
  * Please read the accompanying LICENSE
  * This class is the example to draw a triangle fan.
+ * TODO Draw a fan circle
+ * TODO Draw side of gear
+ * TODO Draw the tooth
+ * TODO Upload the triangulation strategy plot
+ * The gear geometry data refer to 
+ * Gears.java
+ * author: Brian Paul (converted to Java by Ron Cemer and Sven Gothel)
+ *
+gear(gl, 1.0f, 4.0f, 1.0f, 20, 0.7f);
+gear(gl, 0.5f, 2.0f, 2.0f, 10, 0.7f);
+gear(gl, 1.3f, 2.0f, 0.5f, 10, 0.7f);
+gear(GL2 gl,float inner_radius,float outer_radius,float width,
+                   int teeth, float tooth_depth) 
  */
+
 package net.heteroclinic.glchemistry.gl4;
 
 import java.nio.FloatBuffer;
@@ -26,16 +40,18 @@ import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
 import com.jogamp.opengl.util.glsl.ShaderState;
 
-public class TwoStripsOneFanExampleRenderer extends Renderer {
+public class ExampleFanCircleRenderer extends Renderer {
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new BareBoneNewt(new TwoStripsOneFanExampleRenderer());
+				new BareBoneNewt(new ExampleFanCircleRenderer());
 			}
 		});
 	}
+	
+    public static final int VERTEX_COUNT = 10;
 
 	protected PMVMatrix projectionMatrix;
 	protected GLUniformData projectionMatrixUniform;
@@ -76,10 +92,12 @@ public class TwoStripsOneFanExampleRenderer extends Renderer {
             throw new GLException("Error setting mgl_MVMatrix in shader: " + st);
         }
 
+
+        float radius = 4.f;
         if(useInterleaved) {
-        	initVBO_interleaved(gl);
+        	initFanCircle_VBO_interleaved(VERTEX_COUNT, radius,gl);
         } else {
-        	initVBO_nonInterleaved(gl);
+        	initFanCircle_VBO_nonInterleaved(VERTEX_COUNT, radius,gl);
         }
 		isInitialized = true;
 		
@@ -101,7 +119,7 @@ public class TwoStripsOneFanExampleRenderer extends Renderer {
 		this.view = view;
 	}
 
-	public TwoStripsOneFanExampleRenderer() {
+	public ExampleFanCircleRenderer() {
 		//this.view = view;
 		initTransform();
 	}
@@ -159,7 +177,7 @@ public class TwoStripsOneFanExampleRenderer extends Renderer {
 		//gl.glVertexAttribDivisor() is not required since each instance has the same attribute (color).
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
-		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
+		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_FAN, 0, VERTEX_COUNT, NO_OF_INSTANCE);
 		//gl.glVertexAttribDivisor();
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 2, 4, NO_OF_INSTANCE);
 		
@@ -169,41 +187,6 @@ public class TwoStripsOneFanExampleRenderer extends Renderer {
 			verticesVBO.enableBuffer(gl, false);
 			colorsVBO.enableBuffer(gl, false);
 		}
-
-		// DONE Try to draw the second VBO
-		st.uniform(gl, transformMatrixUniform);
-		if(useInterleaved) {
-			interleavedVBO_2.enableBuffer(gl, true);
-		} else {
-			verticesVBO_2.enableBuffer(gl, true);
-			colorsVBO_2.enableBuffer(gl, true);
-		}
-		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
-		if(useInterleaved) {
-			interleavedVBO_2.enableBuffer(gl, false);
-		} else {
-			verticesVBO_2.enableBuffer(gl, false);
-			colorsVBO_2.enableBuffer(gl, false);
-		}
-		// END Try to draw the second VBO
-		
-		
-		// DONE Try to draw the third VBO for a GL4.GL_TRIANGLE_FAN 
-		st.uniform(gl, transformMatrixUniform);
-		if(useInterleaved) {
-			interleavedVBO_3.enableBuffer(gl, true);
-		} else {
-			verticesVBO_3.enableBuffer(gl, true);
-			colorsVBO_3.enableBuffer(gl, true);
-		}
-		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_FAN, 0, 5, NO_OF_INSTANCE);
-		if(useInterleaved) {
-			interleavedVBO_3.enableBuffer(gl, false);
-		} else {
-			verticesVBO_3.enableBuffer(gl, false);
-			colorsVBO_3.enableBuffer(gl, false);
-		}
-		// END Try to draw the third VBO
 
 		st.useProgram(gl, false); 
 		
@@ -227,71 +210,47 @@ public class TwoStripsOneFanExampleRenderer extends Renderer {
 	protected GLArrayDataServer interleavedVBO;
 	protected GLArrayDataClient verticesVBO;
 	protected GLArrayDataClient colorsVBO;
-
-	protected GLArrayDataServer interleavedVBO_2;
-	protected GLArrayDataClient verticesVBO_2;
-	protected GLArrayDataClient colorsVBO_2;
-
-	protected GLArrayDataServer interleavedVBO_3;
-	protected GLArrayDataClient verticesVBO_3;
-	protected GLArrayDataClient colorsVBO_3;
-
 	
-	public static final float realWorldScale = 4.0f;
-	protected static final float[] vertices = {
-		1.0f*realWorldScale, 0.0f*realWorldScale, 0,
-		-0.5f*realWorldScale, 0.866f*realWorldScale, 0,
-		-0.5f*realWorldScale, -0.866f*realWorldScale, 0,
-		(-1.0f-0.866f) *realWorldScale, 0f*realWorldScale, 0,
-		(-1.0f-0.866f) *realWorldScale, -0.866f*2.0f*realWorldScale, 0
-	};
-
-	public static final float secondStripOffsetx =8.0f;
-	public static final float secondStripOffsety = 4.0f;
-	protected static final float[] vertices_2 = {
-		1.0f*realWorldScale + secondStripOffsetx, 0.0f*realWorldScale + secondStripOffsety, 0,
-		-0.5f*realWorldScale  + secondStripOffsetx, 0.866f*realWorldScale + secondStripOffsety, 0,
-		-0.5f*realWorldScale  + secondStripOffsetx, -0.866f*realWorldScale + secondStripOffsety, 0,
-		(-1.0f-0.866f) *realWorldScale + secondStripOffsetx, 0f*realWorldScale + secondStripOffsety, 0,
-		(-1.0f-0.866f) *realWorldScale + secondStripOffsetx, -0.866f*2.0f*realWorldScale + secondStripOffsety, 0
-	};
-
-	protected static final float[] vertices_3 = {
-		0f,4.0f,0f,
-		-6f,8.0f,0f,
-		-4f,10.0f,0f,
-		4f,10.0f,0f,
-		6f,8.0f,0f
-	};
+//	public static final float realWorldScale = 4.0f;
+//	protected static final float[] vertices = {
+//		1.0f*realWorldScale, 0.0f*realWorldScale, 0,
+//		-0.5f*realWorldScale, 0.866f*realWorldScale, 0,
+//		-0.5f*realWorldScale, -0.866f*realWorldScale, 0,
+//		(-1.0f-0.866f) *realWorldScale, 0f*realWorldScale, 0,
+//		(-1.0f-0.866f) *realWorldScale, -0.866f*2.0f*realWorldScale, 0
+//	};	
+//	protected final float[] colors = {
+//			1.0f, 0.0f, 0.0f, 1.0f,
+//			0.0f, 1.0f, 0.0f, 1.0f,
+//			0f, 0f, 1.0f, 1f,
+//			0.0f, 1.0f, 0.0f, 1.0f,
+//			1.0f, 0.0f, 0.0f, 1.0f
+//	};
 	
-	protected final float[] colors = {
-			1.0f, 0.0f, 0.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-			0f, 0f, 1.0f, 1f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f
-	};
-	
-	// We can use one colors, but this is low coupling.
-	protected final float[] colors_2 = {
-			1.0f, 0.0f, 0.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-			0f, 0f, 1.0f, 1f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f
-	};
-
-	protected final float[] colors_3 = {
-			1.0f, 0.0f, 0.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-			0f, 0f, 1.0f, 1f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f
-	};
-
-	protected void initVBO_nonInterleaved(GL4 gl) {
-		int VERTEX_COUNT = 5;
+	final static public int vertexDimension =3 ;
+	final static public int colorDimension =4 ;
+	protected void initFanCircle_VBO_nonInterleaved(int VERTEX_COUNT, float r, GL4 gl) {
 		{
+			
+			float [] vertices = new float [(VERTEX_COUNT+1) * vertexDimension];
+			float step =  2.0f * (float) Math.PI / VERTEX_COUNT;
+			float angle = 0f;
+			for (int i = 0; i <= VERTEX_COUNT; i++) {
+				vertices[0+i*vertexDimension] = 0f;
+				vertices[1+i*vertexDimension] = r * (float)Math.cos(angle);
+				vertices[2+i*vertexDimension] = r * (float)Math.sin(angle);
+				angle += step;
+			}
+
+			float [] colors = new float [(VERTEX_COUNT+1) * colorDimension];
+			for (int i = 0; i <= VERTEX_COUNT; i++) {
+				colors[0+i*colorDimension] = (i%3==1)?1.0f:0f ;
+				colors[1+i*colorDimension] = (i%3==2)?1.0f:0f ;
+				colors[2+i*colorDimension] = (i%3==0)?1.0f:0f ;
+				colors[3+i*colorDimension] = 1.0f;
+			}
+
+			
 	        verticesVBO = GLArrayDataClient.createGLSL("mgl_Vertex", 3, GL4.GL_FLOAT, false, VERTEX_COUNT);
 	        FloatBuffer verticeBuf = (FloatBuffer)verticesVBO.getBuffer();
 	        verticeBuf.put(vertices);
@@ -303,54 +262,56 @@ public class TwoStripsOneFanExampleRenderer extends Renderer {
 	        colorsVBO.seal(gl, true);
 	
 	        verticesVBO.enableBuffer(gl, false);
-	        colorsVBO.enableBuffer(gl, false);
+	        colorsVBO.enableBuffer(gl, false);			
+
 	
 	        st.ownAttribute(verticesVBO, true);
 	        st.ownAttribute(colorsVBO, true);
 			st.useProgram(gl, false);
 		}
-		{
-	        verticesVBO_2 = GLArrayDataClient.createGLSL("mgl_Vertex", 3, GL4.GL_FLOAT, false, VERTEX_COUNT);
-	        FloatBuffer verticeBuf = (FloatBuffer)verticesVBO_2.getBuffer();
-	        verticeBuf.put(vertices_2);
-	        verticesVBO_2.seal(gl, true);
-	
-	        colorsVBO_2 = GLArrayDataClient.createGLSL("mgl_Color",  4, GL4.GL_FLOAT, false, VERTEX_COUNT);
-	        FloatBuffer colorBuf = (FloatBuffer)colorsVBO_2.getBuffer();
-	        colorBuf.put(colors_2);
-	        colorsVBO_2.seal(gl, true);
-	
-	        verticesVBO_2.enableBuffer(gl, false);
-	        colorsVBO_2.enableBuffer(gl, false);
-	
-	        st.ownAttribute(verticesVBO_2, true);
-	        st.ownAttribute(colorsVBO_2, true);
-			st.useProgram(gl, false);
-		}		
-		{
-	        verticesVBO_3 = GLArrayDataClient.createGLSL("mgl_Vertex", 3, GL4.GL_FLOAT, false, VERTEX_COUNT);
-	        FloatBuffer verticeBuf = (FloatBuffer)verticesVBO_3.getBuffer();
-	        verticeBuf.put(vertices_3);
-	        verticesVBO_3.seal(gl, true);
-	
-	        colorsVBO_3 = GLArrayDataClient.createGLSL("mgl_Color",  4, GL4.GL_FLOAT, false, VERTEX_COUNT);
-	        FloatBuffer colorBuf = (FloatBuffer)colorsVBO_3.getBuffer();
-	        colorBuf.put(colors_3);
-	        colorsVBO_3.seal(gl, true);
-	
-	        verticesVBO_3.enableBuffer(gl, false);
-	        colorsVBO_3.enableBuffer(gl, false);
-	
-	        st.ownAttribute(verticesVBO_3, true);
-	        st.ownAttribute(colorsVBO_3, true);
-			st.useProgram(gl, false);
-		}
 	}
 
 
-	protected void initVBO_interleaved(GL4 gl) {
-		int VERTEX_COUNT = 5;
+	protected void initFanCircle_VBO_interleaved(int VERTEX_COUNT,float r,GL4 gl) {
 		{
+//			VERTEX_COUNT = 5;
+//final float realWorldScale = 4.0f;
+//			final float[] vertices = {
+//			1.0f*realWorldScale, 0.0f*realWorldScale, 0,
+//			-0.5f*realWorldScale, 0.866f*realWorldScale, 0,
+//			-0.5f*realWorldScale, -0.866f*realWorldScale, 0,
+//			(-1.0f-0.866f) *realWorldScale, 0f*realWorldScale, 0,
+//			(-1.0f-0.866f) *realWorldScale, -0.866f*2.0f*realWorldScale, 0
+//		};	
+//		final float[] colors = {
+//				1.0f, 0.0f, 0.0f, 1.0f,
+//				0.0f, 1.0f, 0.0f, 1.0f,
+//				0f, 0f, 1.0f, 1f,
+//				0.0f, 1.0f, 0.0f, 1.0f,
+//				1.0f, 0.0f, 0.0f, 1.0f
+//		};
+		
+			float [] vertices = new float [(VERTEX_COUNT+2) * vertexDimension];
+			float step =  2.0f * (float) Math.PI / VERTEX_COUNT;
+			float angle = 0f;
+			vertices[0+0*vertexDimension] = 0f;
+			vertices[2+0*vertexDimension] =  0f;
+			vertices[1+0*vertexDimension] =  0f;
+
+			for (int i = VERTEX_COUNT+1; i >=1; i--) {
+				vertices[0+i*vertexDimension] = 0f;
+				vertices[1+i*vertexDimension] = r * (float)Math.cos(angle);
+				vertices[2+i*vertexDimension] = r * (float)Math.sin(angle);
+				angle += step;
+			}
+
+			float [] colors = new float [(VERTEX_COUNT+2) * colorDimension];
+			for (int i = 0; i <= VERTEX_COUNT+1; i++) {
+				colors[0+i*colorDimension] = (i%3==1)?1.0f:0f ;
+				colors[1+i*colorDimension] = (i%3==2)?1.0f:0f ;
+				colors[2+i*colorDimension] = (i%3==0)?1.0f:0f ;
+				colors[3+i*colorDimension] = 1.0f;
+			}
 			interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, VERTEX_COUNT, GL.GL_STATIC_DRAW);
 	        interleavedVBO.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
 	        interleavedVBO.addGLSLSubArray("mgl_Color",  4, GL.GL_ARRAY_BUFFER);
@@ -364,38 +325,6 @@ public class TwoStripsOneFanExampleRenderer extends Renderer {
 	        interleavedVBO.seal(gl, true);
 	        interleavedVBO.enableBuffer(gl, false);
 	        st.ownAttribute(interleavedVBO, true);
-			st.useProgram(gl, false);
-		}
-		{
-			interleavedVBO_2 = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, VERTEX_COUNT, GL.GL_STATIC_DRAW);
-	        interleavedVBO_2.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
-	        interleavedVBO_2.addGLSLSubArray("mgl_Color",  4, GL.GL_ARRAY_BUFFER);
-	
-	        FloatBuffer ib = (FloatBuffer)interleavedVBO_2.getBuffer();
-	
-	        for(int i = 0; i < VERTEX_COUNT; i++) {
-	            ib.put(vertices_2,  i*3, 3);
-	            ib.put(colors_2,    i*4, 4);
-	        }
-	        interleavedVBO_2.seal(gl, true);
-	        interleavedVBO_2.enableBuffer(gl, false);
-	        st.ownAttribute(interleavedVBO_2, true);
-			st.useProgram(gl, false);
-		}
-		{
-			interleavedVBO_3 = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, VERTEX_COUNT, GL.GL_STATIC_DRAW);
-	        interleavedVBO_3.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
-	        interleavedVBO_3.addGLSLSubArray("mgl_Color",  4, GL.GL_ARRAY_BUFFER);
-	
-	        FloatBuffer ib = (FloatBuffer)interleavedVBO_3.getBuffer();
-	
-	        for(int i = 0; i < VERTEX_COUNT; i++) {
-	            ib.put(vertices_3,  i*3, 3);
-	            ib.put(colors_3,    i*4, 4);
-	        }
-	        interleavedVBO_3.seal(gl, true);
-	        interleavedVBO_3.enableBuffer(gl, false);
-	        st.ownAttribute(interleavedVBO_3, true);
 			st.useProgram(gl, false);
 		}
 	}
