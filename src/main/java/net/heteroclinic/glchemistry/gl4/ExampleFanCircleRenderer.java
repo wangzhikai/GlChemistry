@@ -51,7 +51,7 @@ public class ExampleFanCircleRenderer extends Renderer {
 		});
 	}
 	
-    public static final int VERTEX_COUNT = 10;
+    //public static final int VERTEX_COUNT = 5;
 
 	protected PMVMatrix projectionMatrix;
 	protected GLUniformData projectionMatrixUniform;
@@ -93,15 +93,17 @@ public class ExampleFanCircleRenderer extends Renderer {
         }
 
 
-        float radius = 4.f;
+        float radius = 10.f;
+        
         if(useInterleaved) {
-        	initFanCircle_VBO_interleaved(VERTEX_COUNT, radius,gl);
+        	initFanCircle_VBO_interleaved(totalFans, radius,gl);
         } else {
-        	initFanCircle_VBO_nonInterleaved(VERTEX_COUNT, radius,gl);
+        	initFanCircle_VBO_nonInterleaved(totalFans, radius,gl);
         }
 		isInitialized = true;
 		
 	}
+	public static final int totalFans = 36;
 
 	@Override
 	public void dispose(GLAutoDrawable drawable) {
@@ -177,7 +179,7 @@ public class ExampleFanCircleRenderer extends Renderer {
 		//gl.glVertexAttribDivisor() is not required since each instance has the same attribute (color).
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
-		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_FAN, 0, VERTEX_COUNT, NO_OF_INSTANCE);
+		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_FAN, 0, totalFans+2, NO_OF_INSTANCE);
 		//gl.glVertexAttribDivisor();
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 2, 4, NO_OF_INSTANCE);
 		
@@ -241,6 +243,7 @@ public class ExampleFanCircleRenderer extends Renderer {
 				vertices[2+i*vertexDimension] = r * (float)Math.sin(angle);
 				angle += step;
 			}
+			System.out.println(vertices);
 
 			float [] colors = new float [(VERTEX_COUNT+1) * colorDimension];
 			for (int i = 0; i <= VERTEX_COUNT; i++) {
@@ -272,7 +275,7 @@ public class ExampleFanCircleRenderer extends Renderer {
 	}
 
 
-	protected void initFanCircle_VBO_interleaved(int VERTEX_COUNT,float r,GL4 gl) {
+	protected void initFanCircle_VBO_interleaved(int fans,float r,GL4 gl) {
 		{
 //			VERTEX_COUNT = 5;
 //final float realWorldScale = 4.0f;
@@ -291,34 +294,42 @@ public class ExampleFanCircleRenderer extends Renderer {
 //				1.0f, 0.0f, 0.0f, 1.0f
 //		};
 		
-			float [] vertices = new float [(VERTEX_COUNT+2) * vertexDimension];
-			float step =  2.0f * (float) Math.PI / VERTEX_COUNT;
+			float [] vertices = new float [(fans+2) * vertexDimension];
+			float step =  2.0f * (float) Math.PI / fans;
 			float angle = 0f;
 			vertices[0+0*vertexDimension] = 0f;
 			vertices[2+0*vertexDimension] =  0f;
 			vertices[1+0*vertexDimension] =  0f;
 
-			for (int i = VERTEX_COUNT+1; i >=1; i--) {
-				vertices[0+i*vertexDimension] = 0f;
-				vertices[1+i*vertexDimension] = r * (float)Math.cos(angle);
-				vertices[2+i*vertexDimension] = r * (float)Math.sin(angle);
+			
+			for (int i =2; i  <=fans+2; i++) {
+				
+				vertices[0+(i-1)*vertexDimension] =r * (float)Math.cos(angle);
+				vertices[1+(i-1)*vertexDimension] = r * (float)Math.sin(angle);
+				vertices[2+(i-1)*vertexDimension] = 0f;
 				angle += step;
+				
 			}
-
-			float [] colors = new float [(VERTEX_COUNT+2) * colorDimension];
-			for (int i = 0; i <= VERTEX_COUNT+1; i++) {
+			for (int i = 0; i<vertices.length; i++) {
+				if (i%3 == 0)
+					System.out.println();
+				System.out.print(vertices[i]+ " ");
+			}
+			
+			float [] colors = new float [(fans+2) * colorDimension];
+			for (int i = 0; i <= fans+1; i++) {
 				colors[0+i*colorDimension] = (i%3==1)?1.0f:0f ;
 				colors[1+i*colorDimension] = (i%3==2)?1.0f:0f ;
 				colors[2+i*colorDimension] = (i%3==0)?1.0f:0f ;
 				colors[3+i*colorDimension] = 1.0f;
 			}
-			interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, VERTEX_COUNT, GL.GL_STATIC_DRAW);
+			interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, fans+2, GL.GL_STATIC_DRAW);
 	        interleavedVBO.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
 	        interleavedVBO.addGLSLSubArray("mgl_Color",  4, GL.GL_ARRAY_BUFFER);
 	
 	        FloatBuffer ib = (FloatBuffer)interleavedVBO.getBuffer();
 	
-	        for(int i = 0; i < VERTEX_COUNT; i++) {
+	        for(int i = 0; i < fans+2; i++) {
 	            ib.put(vertices,  i*3, 3);
 	            ib.put(colors,    i*4, 4);
 	        }
