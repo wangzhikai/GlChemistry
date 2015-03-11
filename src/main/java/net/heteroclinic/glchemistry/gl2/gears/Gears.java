@@ -131,12 +131,22 @@ public void init(GLAutoDrawable drawable) {
     gl.glEnable(GL2.GL_LIGHT0);
     gl.glEnable(GL2.GL_DEPTH_TEST);
 
+    int teeth = 20;
     /* make the gears */
     if(0>=gear1) {
         gear1 = gl.glGenLists(1);
         gl.glNewList(gear1, GL2.GL_COMPILE);
         gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, red, 0);
-        gear(gl, 1.0f, 4.0f, 1.0f, 20, 0.7f);
+        //gear(gl, 1.0f, 4.0f, 1.0f, 20, 0.7f);
+        /*
+        public static void gear(GL2 gl,
+                float inner_radius,
+                float outer_radius,
+                float width,
+                int teeth,
+                float tooth_depth)
+                */
+        gear(gl, 1.0f, 4.0f, 1.0f, teeth, 0.7f);
         gl.glEndList();
         System.err.println("gear1 list created: "+gear1);
     } else {
@@ -209,7 +219,7 @@ public void dispose(GLAutoDrawable drawable) {
   @Override
 public void display(GLAutoDrawable drawable) {
     // Turn the gears' teeth
-    angle += 2.0f;
+    //angle += 2.0f;
 
     // Get the GL corresponding to the drawable we are animating
     GL2 gl = drawable.getGL().getGL2();
