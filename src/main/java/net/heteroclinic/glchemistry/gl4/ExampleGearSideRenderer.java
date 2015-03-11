@@ -311,8 +311,8 @@ public class ExampleGearSideRenderer extends Renderer {
 				vertices[3+ 2*3+i*vertices_per_fan*vertexDimension +2] = 0f;
 
 				// point 2
-				vertices[3+ 3*3+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+3.0f*da) ;
-				vertices[3+ 3*3+i*vertices_per_fan*vertexDimension +1] = rout *  (float)Math.sin(theta+3.0f*da);
+				vertices[3+ 3*3+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta+3.0f*da) ;
+				vertices[3+ 3*3+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta+3.0f*da);
 				vertices[3+ 3*3+i*vertices_per_fan*vertexDimension +2] = 0f;
 
 				
@@ -320,14 +320,14 @@ public class ExampleGearSideRenderer extends Renderer {
 			}
 
 			
-			for (int i =2; i  <=fans+2; i++) {
-				
-				vertices[0+(i-1)*vertexDimension] =r * (float)Math.cos(theta);
-				vertices[1+(i-1)*vertexDimension] = r * (float)Math.sin(theta);
-				vertices[2+(i-1)*vertexDimension] = 0f;
-				theta += step;
-				
-			}
+//			for (int i =2; i  <=fans+2; i++) {
+//				
+//				vertices[0+(i-1)*vertexDimension] =r * (float)Math.cos(theta);
+//				vertices[1+(i-1)*vertexDimension] = r * (float)Math.sin(theta);
+//				vertices[2+(i-1)*vertexDimension] = 0f;
+//				theta += step;
+//				
+//			}
 			for (int i = 0; i<vertices.length; i++) {
 				if (i%3 == 0)
 					System.out.println();
