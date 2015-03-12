@@ -3,9 +3,10 @@
  * www.heteroclinic.net
  * Please read the accompanying LICENSE
  * This class is the example to draw a triangle fan.
- * TODO Draw a fan circle
- * TODO Draw side of gear
- * TODO Draw the tooth
+ * TO-DO Draw a fan circle
+ * TO-DO Draw side of gear
+ * TO-DO Draw the tooth
+ * TODO Draw the gear with shaft hole
  * TODO Upload the triangulation strategy plot
  * The gear geometry data refer to 
  * Gears.java
@@ -179,7 +180,9 @@ public class ExampleGearSideRenderer extends Renderer {
 		//gl.glVertexAttribDivisor() is not required since each instance has the same attribute (color).
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 0, 3, NO_OF_INSTANCE);
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_STRIP, 0, 5, NO_OF_INSTANCE);
-		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_FAN, 0, totalFans+2, NO_OF_INSTANCE);
+		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_FAN, 0, totalFans+2, NO_OF_INSTANCE);
+		int totalVertices = totalFans*vertices_per_fan +2;
+		gl.glDrawArraysInstanced(GL4.GL_TRIANGLE_FAN, 0, totalVertices, NO_OF_INSTANCE);
 		//gl.glVertexAttribDivisor();
 		//gl.glDrawArraysInstanced(GL4.GL_TRIANGLES, 2, 4, NO_OF_INSTANCE);
 		
@@ -274,13 +277,15 @@ public class ExampleGearSideRenderer extends Renderer {
 		}
 	}
 
+	public static final int vertices_per_fan = 4; 
 
 	protected void initFanCircle_VBO_interleaved(int fans,float r,GL4 gl) {
 		{
-			int vertices_per_fan = 4; 
+			//int vertices_per_fan = 4; 
 		
 			//float [] vertices = new float [(fans+2) * vertexDimension];
-			float [] vertices = new float [(fans*vertices_per_fan +1) * vertexDimension];
+			int totalVertices = (fans*vertices_per_fan +2);
+			float [] vertices = new float [totalVertices * vertexDimension];
 			float step =  2.0f * (float) Math.PI / fans;
 			float da = step/4.0f;
 			float theta = 0f;
@@ -296,9 +301,16 @@ public class ExampleGearSideRenderer extends Renderer {
 			
 			for (int i = 0; i< fans ; i++) {
 				// point 1
-				vertices[3+ 0*3+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta) ;
-				vertices[3+ 0*3+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta);
-				vertices[3+ 0*3+i*vertices_per_fan*vertexDimension +2] = 0f;
+				
+					vertices[3+ 0*3+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta) ;
+					vertices[3+ 0*3+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta);
+					vertices[3+ 0*3+i*vertices_per_fan*vertexDimension +2] = 0f;
+					// close the gear
+				if (i == 0) {
+					vertices[ (totalVertices - 1)*vertexDimension +0] = rin *  (float)Math.cos(theta) ;
+					vertices[(totalVertices - 1)*vertexDimension +1] = rin *  (float)Math.sin(theta);
+					vertices[(totalVertices - 1)*vertexDimension +2] = 0f;
+				}
 
 				// point 2
 				vertices[3+ 1*3+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+da) ;
@@ -334,20 +346,20 @@ public class ExampleGearSideRenderer extends Renderer {
 				System.out.print(vertices[i]+ " ");
 			}
 			
-			float [] colors = new float [(fans*vertices_per_fan +1) * colorDimension];
-			for (int i = 0; i <= fans+1; i++) {
+			float [] colors = new float [totalVertices * colorDimension];
+			for (int i = 0; i < totalVertices; i++) {
 				colors[0+i*colorDimension] = (i%3==1)?1.0f:0f ;
 				colors[1+i*colorDimension] = (i%3==2)?1.0f:0f ;
 				colors[2+i*colorDimension] = (i%3==0)?1.0f:0f ;
 				colors[3+i*colorDimension] = 1.0f;
 			}
-			interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, fans+2, GL.GL_STATIC_DRAW);
+			interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, totalVertices, GL.GL_STATIC_DRAW);
 	        interleavedVBO.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
 	        interleavedVBO.addGLSLSubArray("mgl_Color",  4, GL.GL_ARRAY_BUFFER);
 	
 	        FloatBuffer ib = (FloatBuffer)interleavedVBO.getBuffer();
 	
-	        for(int i = 0; i < fans+2; i++) {
+	        for(int i = 0; i < totalVertices; i++) {
 	            ib.put(vertices,  i*3, 3);
 	            ib.put(colors,    i*4, 4);
 	        }
