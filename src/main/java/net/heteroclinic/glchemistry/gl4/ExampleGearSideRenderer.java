@@ -2,12 +2,23 @@
  * @author Zhikai Wang
  * www.heteroclinic.net
  * Please read the accompanying LICENSE
+ * I happened to design a gear box in my first engineering degree.
+ * The whole process took about two months, hand draft pencil paper calculator work. AUTOCAD was expensive and not allowed. 
+ * The gear teeth don't have flat surface, they are of smooth curve so the line of contact is always maintained.
+ * Otherwise, the gear box will clank horribly. My design was never put to real, but the professor reviewed it seriously.
+ * For the beauty, my gears are like two twins (just one shift). The two gears sizes are quite even -- 1:1.x something.
+ * But the professor said there is no meaning to design such a gear box. At least it should be 1:2.x, 1:3 better. This is something you never do you never know.
+ * 
  * This class is the example to draw a triangle fan.
+ * 
+ * Task list
  * TO-DO Draw a fan circle
  * TO-DO Draw side of gear
  * TO-DO Draw the tooth
  * TODO Draw the gear with shaft hole
  * TODO Upload the triangulation strategy plot
+ * 
+ * Reference:
  * The gear geometry data refer to 
  * Gears.java
  * author: Brian Paul (converted to Java by Ron Cemer and Sven Gothel)
@@ -17,6 +28,9 @@ gear(gl, 0.5f, 2.0f, 2.0f, 10, 0.7f);
 gear(gl, 1.3f, 2.0f, 0.5f, 10, 0.7f);
 gear(GL2 gl,float inner_radius,float outer_radius,float width,
                    int teeth, float tooth_depth) 
+                   
+                   
+ * 
  */
 
 package net.heteroclinic.glchemistry.gl4;
