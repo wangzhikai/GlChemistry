@@ -56,13 +56,13 @@ import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
 import com.jogamp.opengl.util.glsl.ShaderState;
 
-public class ExampleGearSideWithShaftHoleRenderer extends Renderer {
+public class ExampleGearOuterStripRenderer extends Renderer {
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new BareBoneNewt(new ExampleGearSideWithShaftHoleRenderer());
+				new BareBoneNewt(new ExampleGearOuterStripRenderer());
 			}
 		});
 	}
@@ -138,7 +138,7 @@ public class ExampleGearSideWithShaftHoleRenderer extends Renderer {
 		this.view = view;
 	}
 
-	public ExampleGearSideWithShaftHoleRenderer() {
+	public ExampleGearOuterStripRenderer() {
 		//this.view = view;
 		initTransform();
 	}
@@ -226,7 +226,7 @@ public class ExampleGearSideWithShaftHoleRenderer extends Renderer {
 		projectionMatrix.glMatrixMode(GL2.GL_PROJECTION);
 		projectionMatrix.glLoadIdentity();
 		projectionMatrix.gluPerspective(45, aspect, 0.001f, 20f);
-		projectionMatrix.gluLookAt(0, 0, -10, 0, 0, 0, 0, 1, 0);
+		projectionMatrix.gluLookAt(0, 8, 8, 0, 0, 0, 0, 1, 0);
 	}
 	
 	protected GLArrayDataServer interleavedVBO;
@@ -298,6 +298,7 @@ public class ExampleGearSideWithShaftHoleRenderer extends Renderer {
 
 	protected void initFanCircle_VBO_interleaved(int fans,float r,float s ,GL4 gl) {
 		{
+			float width = 2.0f;
 			//int vertices_per_fan = 4; 
 		
 			//float [] vertices = new float [(fans+2) * vertexDimension];
@@ -323,94 +324,94 @@ public class ExampleGearSideWithShaftHoleRenderer extends Renderer {
 					// point 2
 					vertices[0*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta) ;
 					vertices[0*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta);
-					vertices[0*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[0*vertexDimension+i*vertices_per_fan*vertexDimension +2] = -width/2.0f;
 	
 					// point 1
-					vertices[1*vertexDimension+i*vertices_per_fan*vertexDimension +0] = s *  (float)Math.cos(theta) ;
-					vertices[1*vertexDimension+i*vertices_per_fan*vertexDimension +1] = s *  (float)Math.sin(theta);
-					vertices[1*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[1*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta) ;
+					vertices[1*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta);
+					vertices[1*vertexDimension+i*vertices_per_fan*vertexDimension +2] = width/2.0f;
 					
 					// point 3
 					vertices[2*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+da) ;
 					vertices[2*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rout *  (float)Math.sin(theta+da);
-					vertices[2*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[2*vertexDimension+i*vertices_per_fan*vertexDimension +2] = -width/2.0f;
 	
 					// point 4
-					vertices[3*vertexDimension+i*vertices_per_fan*vertexDimension +0] = s *  (float)Math.cos(theta+da) ;
-					vertices[3*vertexDimension+i*vertices_per_fan*vertexDimension +1] = s *  (float)Math.sin(theta+da);
-					vertices[3*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[3*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+da) ;
+					vertices[3*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rout *  (float)Math.sin(theta+da);
+					vertices[3*vertexDimension+i*vertices_per_fan*vertexDimension +2] = width/2.0f;
 	
 					// point 5
 					vertices[4*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+2.0f*da) ;
 					vertices[4*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rout *  (float)Math.sin(theta+2.0f*da);
-					vertices[4*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[4*vertexDimension+i*vertices_per_fan*vertexDimension +2] = -width/2.0f;
 					
 					// point 6
-					vertices[5*vertexDimension+i*vertices_per_fan*vertexDimension +0] = s *  (float)Math.cos(theta+2.0f*da) ;
-					vertices[5*vertexDimension+i*vertices_per_fan*vertexDimension +1] = s *  (float)Math.sin(theta+2.0f*da);
-					vertices[5*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[5*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+2.0f*da) ;
+					vertices[5*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rout *  (float)Math.sin(theta+2.0f*da);
+					vertices[5*vertexDimension+i*vertices_per_fan*vertexDimension +2] = width/2.0f;
 	
 					// point 7
 					vertices[6*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta+3.0f*da) ;
 					vertices[6*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta+3.0f*da);
-					vertices[6*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[6*vertexDimension+i*vertices_per_fan*vertexDimension +2] = -width/2.0f;
 					
 					// point 8
-					vertices[7*vertexDimension+i*vertices_per_fan*vertexDimension +0] = s *  (float)Math.cos(theta+3.0f*da) ;
-					vertices[7*vertexDimension+i*vertices_per_fan*vertexDimension +1] = s *  (float)Math.sin(theta+3.0f*da);
-					vertices[7*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[7*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta+3.0f*da) ;
+					vertices[7*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta+3.0f*da);
+					vertices[7*vertexDimension+i*vertices_per_fan*vertexDimension +2] = width/2.0f;
 					
 					// point 9
 					vertices[8*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta+4.0f*da) ;
 					vertices[8*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta+4.0f*da);
-					vertices[8*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[8*vertexDimension+i*vertices_per_fan*vertexDimension +2] = -width/2.0f;
 	
 					// point 10
 	
-					vertices[9*3+i*vertices_per_fan*vertexDimension +0] = s *  (float)Math.cos(theta+4.0f*da) ;
-					vertices[9*3+i*vertices_per_fan*vertexDimension +1] = s *  (float)Math.sin(theta+4.0f*da);
-					vertices[9*3+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[9*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta+4.0f*da) ;
+					vertices[9*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta+4.0f*da);
+					vertices[9*vertexDimension+i*vertices_per_fan*vertexDimension +2] = width/2.0f;
 				} else {
 					// point 3
 					vertices[2*vertexDimension + 0*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+da) ;
 					vertices[2*vertexDimension + 0*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rout *  (float)Math.sin(theta+da);
-					vertices[2*vertexDimension + 0*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[2*vertexDimension + 0*vertexDimension+i*vertices_per_fan*vertexDimension +2] = -width/2.0f;
 	
 					// point 4
-					vertices[2*vertexDimension + 1*vertexDimension+i*vertices_per_fan*vertexDimension +0] = s *  (float)Math.cos(theta+da) ;
-					vertices[2*vertexDimension + 1*vertexDimension+i*vertices_per_fan*vertexDimension +1] = s *  (float)Math.sin(theta+da);
-					vertices[2*vertexDimension + 1*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[2*vertexDimension + 1*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+da) ;
+					vertices[2*vertexDimension + 1*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rout *  (float)Math.sin(theta+da);
+					vertices[2*vertexDimension + 1*vertexDimension+i*vertices_per_fan*vertexDimension +2] = width/2.0f;
 	
 					// point 5
 					vertices[2*vertexDimension + 2*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+2.0f*da) ;
 					vertices[2*vertexDimension + 2*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rout *  (float)Math.sin(theta+2.0f*da);
-					vertices[2*vertexDimension + 2*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[2*vertexDimension + 2*vertexDimension+i*vertices_per_fan*vertexDimension +2] = -width/2.0f;
 					
 					// point 6
-					vertices[2*vertexDimension + 3*vertexDimension+i*vertices_per_fan*vertexDimension +0] = s *  (float)Math.cos(theta+2.0f*da) ;
-					vertices[2*vertexDimension + 3*vertexDimension+i*vertices_per_fan*vertexDimension +1] = s *  (float)Math.sin(theta+2.0f*da);
-					vertices[2*vertexDimension + 3*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[2*vertexDimension + 3*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rout *  (float)Math.cos(theta+2.0f*da) ;
+					vertices[2*vertexDimension + 3*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rout *  (float)Math.sin(theta+2.0f*da);
+					vertices[2*vertexDimension + 3*vertexDimension+i*vertices_per_fan*vertexDimension +2] = width/2.0f;
 	
 					// point 7
 					vertices[2*vertexDimension + 4*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta+3.0f*da) ;
 					vertices[2*vertexDimension + 4*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta+3.0f*da);
-					vertices[2*vertexDimension + 4*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[2*vertexDimension + 4*vertexDimension+i*vertices_per_fan*vertexDimension +2] = -width/2.0f;
 					
 					// point 8
-					vertices[2*vertexDimension + 5*vertexDimension+i*vertices_per_fan*vertexDimension +0] = s *  (float)Math.cos(theta+3.0f*da) ;
-					vertices[2*vertexDimension + 5*vertexDimension+i*vertices_per_fan*vertexDimension +1] = s *  (float)Math.sin(theta+3.0f*da);
-					vertices[2*vertexDimension + 5*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[2*vertexDimension + 5*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta+3.0f*da) ;
+					vertices[2*vertexDimension + 5*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta+3.0f*da);
+					vertices[2*vertexDimension + 5*vertexDimension+i*vertices_per_fan*vertexDimension +2] = width/2.0f;
 					
 					// point 9
 					vertices[2*vertexDimension + 6*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta+4.0f*da) ;
 					vertices[2*vertexDimension + 6*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta+4.0f*da);
-					vertices[2*vertexDimension + 6*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[2*vertexDimension + 6*vertexDimension+i*vertices_per_fan*vertexDimension +2] = -width/2.0f;
 	
 					// point 10
 	
-					vertices[2*vertexDimension + 7*vertexDimension+i*vertices_per_fan*vertexDimension +0] = s *  (float)Math.cos(theta+4.0f*da) ;
-					vertices[2*vertexDimension + 7*vertexDimension+i*vertices_per_fan*vertexDimension +1] = s *  (float)Math.sin(theta+4.0f*da);
-					vertices[2*vertexDimension + 7*vertexDimension+i*vertices_per_fan*vertexDimension +2] = 0f;
+					vertices[2*vertexDimension + 7*vertexDimension+i*vertices_per_fan*vertexDimension +0] = rin *  (float)Math.cos(theta+4.0f*da) ;
+					vertices[2*vertexDimension + 7*vertexDimension+i*vertices_per_fan*vertexDimension +1] = rin *  (float)Math.sin(theta+4.0f*da);
+					vertices[2*vertexDimension + 7*vertexDimension+i*vertices_per_fan*vertexDimension +2] = width/2.0f;
 					
 				}
 				
