@@ -78,7 +78,11 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 	protected PMVMatrix projectionMatrix;
 	protected GLUniformData projectionMatrixUniform;
 	protected GLUniformData transformMatrixUniform;
+	//protected GLUniformData lightPositionUniform;
 	protected final FloatBuffer triangleTransform = FloatBuffer.allocate(16 * NO_OF_INSTANCE);
+	protected final FloatBuffer lightPosition = FloatBuffer.allocate(3);
+	protected int lightPositionLocation = -1;
+
 	
 	protected static final boolean useInterleaved = true;
 	protected boolean isInitialized = false;
@@ -98,8 +102,8 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 //		System.err.println("GL_VENDOR: " + gl.glGetString(GL4.GL_VENDOR));
 //		System.err.println("GL_RENDERER: " + gl.glGetString(GL4.GL_RENDERER));
 //		System.err.println("GL_VERSION: " + gl.glGetString(GL4.GL_VERSION));
-
-		initShader(gl);
+		//gl.glGetUniformLocation(render_scene_prog, "light_position");
+		int shaderProgramId = initShader(gl);
         projectionMatrix = new PMVMatrix();
 		projectionMatrixUniform = new GLUniformData("mgl_PMatrix", 4, 4, projectionMatrix.glGetPMatrixf());
 		st.ownUniform(projectionMatrixUniform);
@@ -107,13 +111,26 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
             throw new GLException("Error setting mgl_PMatrix in shader: " + st);
         }
 
-        transformMatrixUniform =  new GLUniformData("mgl_MVMatrix", 4, 4, triangleTransform);
-
+        transformMatrixUniform = new GLUniformData("mgl_MVMatrix", 4, 4, triangleTransform);
         st.ownUniform(transformMatrixUniform);
         if(!st.uniform(gl, transformMatrixUniform)) {
             throw new GLException("Error setting mgl_MVMatrix in shader: " + st);
         }
+        //TODO
+        lightPositionLocation = gl.glGetUniformLocation(shaderProgramId, "light_position");
 
+        /* This block fails the program
+        // light positioned at (10.f,10.f,10.f)
+//        lightPosition.clear();
+//        lightPosition.put(new float[] {10.f,10.f,10.f,1f});
+//        lightPosition.rewind();
+        lightPositionUniform =  new GLUniformData("light_position", 4, lightPosition);
+
+        st.ownUniform(lightPositionUniform);
+        if(!st.uniform(gl, lightPositionUniform)) { //failed here
+            throw new GLException("Error setting lightPosition in shader: " + st);
+        }
+        */
 
         float radius = 16.f;
         float shaft_radius = 4.0f;
@@ -178,6 +195,12 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 		GL4 gl = drawable.getGL().getGL4();
 		gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
 
+		//public void glUniform3fv(int location, int count, FloatBuffer v);
+        //light positioned at (10.f,10.f,10.f)
+      lightPosition.clear();
+      lightPosition.put(new float[] {10.f,10.f,10.f});
+      lightPosition.rewind();
+		gl.glUniform3fv(lightPositionLocation, 1, lightPosition);
 
 		st.useProgram(gl, true);
 		projectionMatrix.glMatrixMode(GL2.GL_PROJECTION);
@@ -193,6 +216,7 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 		generateTriangleTransform();
 		
 		st.uniform(gl, transformMatrixUniform);
+
 		
 		/* TODO-1 LIGHT
 		vec3 light_position = vec3(sinf(t * 6.0f * 3.141592f) * 300.0f, 200.0f, cosf(t * 4.0f * 3.141592f) * 100.0f + 250.0f);
@@ -526,14 +550,14 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 		}
 	}
 	
-	protected static final String shaderBasename = "triangles";
+	protected static final String shaderBasename = "lightedTriangles";
 	protected ShaderState st;
 	protected static final int NO_OF_INSTANCE = 1;
 	//protected final FloatBuffer triangleTransform = FloatBuffer.allocate(16 * NO_OF_INSTANCE);
 	protected final Matrix4[] mat = new Matrix4[NO_OF_INSTANCE];
 	protected final float[] rotationSpeed = new float[NO_OF_INSTANCE];
 	
-	protected void initShader(GL4 gl) {
+	protected int initShader(GL4 gl) {
 //        public static ShaderCode create(final GL2ES2 gl, final int type, final Class<?> context,
 //                final String srcRoot, final String binRoot, final String basename, final boolean mutableStringBuilder) {
         ShaderCode vp0 = ShaderCode.create(gl, GL2ES2.GL_VERTEX_SHADER, this.getClass(),
@@ -550,6 +574,7 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 
         // Create & Link the shader program
         ShaderProgram sp = new ShaderProgram();
+        
         sp.add(vp0);
         sp.add(fp0);
         if(!sp.link(gl, System.err)) {
@@ -559,6 +584,7 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
         // Let's manage all our states using ShaderState.
         st = new ShaderState();
         st.attachShaderProgram(gl, sp, true);
+        return sp.id();
     }
 	
 }
