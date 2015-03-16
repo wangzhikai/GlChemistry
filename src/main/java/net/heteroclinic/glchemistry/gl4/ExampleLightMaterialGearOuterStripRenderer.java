@@ -83,6 +83,9 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 	protected final FloatBuffer lightPosition = FloatBuffer.allocate(3);
 	protected int lightPositionLocation = -1;
 
+	protected final FloatBuffer dummyBuffer = FloatBuffer.allocate(4);
+	protected int dummyLocation = -1;
+
 	
 	protected static final boolean useInterleaved = true;
 	protected boolean isInitialized = false;
@@ -118,6 +121,7 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
         }
         //TODO
         lightPositionLocation = gl.glGetUniformLocation(shaderProgramId, "light_position");
+        dummyLocation = gl.glGetUniformLocation(shaderProgramId, "dummy");
 
         /* This block fails the program
         // light positioned at (10.f,10.f,10.f)
@@ -195,14 +199,11 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 		GL4 gl = drawable.getGL().getGL4();
 		gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
 
-		//public void glUniform3fv(int location, int count, FloatBuffer v);
-        //light positioned at (10.f,10.f,10.f)
-      lightPosition.clear();
-      lightPosition.put(new float[] {10.f,10.f,10.f});
-      lightPosition.rewind();
-		gl.glUniform3fv(lightPositionLocation, 1, lightPosition);
 
 		st.useProgram(gl, true);
+		
+		
+		
 		projectionMatrix.glMatrixMode(GL2.GL_PROJECTION);
 		projectionMatrix.glPushMatrix();
 
@@ -216,11 +217,19 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 		generateTriangleTransform();
 		
 		st.uniform(gl, transformMatrixUniform);
+		
+		//public void glUniform3fv(int location, int count, FloatBuffer v);
+        //light positioned at (10.f,10.f,10.f)
+      lightPosition.clear();
+      lightPosition.put(new float[] {10.f,10.f,10.f});
+      lightPosition.rewind();
+		gl.glUniform3fv(lightPositionLocation, 1, lightPosition);
 
 		
-		/* TODO-1 LIGHT
-		vec3 light_position = vec3(sinf(t * 6.0f * 3.141592f) * 300.0f, 200.0f, cosf(t * 4.0f * 3.141592f) * 100.0f + 250.0f);
-		*/
+	      dummyBuffer.clear();
+	      dummyBuffer.put(new float[] {0.f,0.f,1.f,1f});
+	      dummyBuffer.rewind();
+			gl.glUniform4fv(dummyLocation, 1, dummyBuffer);
 
 		
 		/* TODO CULL_FACE causes some problem, need fix, probably CCW issue in traingulation. 

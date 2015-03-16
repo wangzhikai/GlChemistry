@@ -13,6 +13,6 @@ varying vec4    frontColor;
 
 void main (void) {
 	//mgl_FragColor = frontColor; 
-	mgl_FragColor =light_position;
+	mgl_FragColor = light_position;
 	//!mgl_FragColor = vect4(1.0,0.0,0.0,1.0);
 } 
