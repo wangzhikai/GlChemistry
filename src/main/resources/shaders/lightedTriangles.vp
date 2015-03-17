@@ -9,12 +9,18 @@ uniform mat4 mgl_PMatrix;
 uniform mat4 mgl_MVMatrix[NO_OF_INSTANCE];
 uniform vec3 light_position;
 uniform vec4 dummy;
+
+uniform vec3 material_ambient;
+uniform vec3 material_diffuse;
+uniform vec3 material_specular;
+uniform float material_specular_power;
+
 attribute vec3  mgl_Vertex; 
 attribute vec4  mgl_Color; 
 varying vec4    frontColor;
  
 void main(void) { 
-  //frontColor = mgl_Color; 
-  frontColor = dummy; 
+  frontColor = mgl_Color; 
+  //frontColor = dummy; 
   gl_Position = mgl_PMatrix * mgl_MVMatrix[gl_InstanceID] * vec4(mgl_Vertex, 1); 
 } 

@@ -86,6 +86,20 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 	protected final FloatBuffer dummyBuffer = FloatBuffer.allocate(4);
 	protected int dummyLocation = -1;
 
+	protected final FloatBuffer material_ambientBuffer = FloatBuffer.allocate(3);
+	protected int material_ambientLocation = -1;
+	protected final FloatBuffer material_diffuseBuffer = FloatBuffer.allocate(3);
+	protected int material_diffuseLocation = -1;
+	protected final FloatBuffer material_specularBuffer = FloatBuffer.allocate(3);
+	protected int material_specularLocation = -1;
+	protected final FloatBuffer material_specular_powerBuffer = FloatBuffer.allocate(1);
+	protected int material_specular_powerLocation = -1;
+	/*
+	uniform vec3 material_ambient;
+	uniform vec3 material_diffuse;
+	uniform vec3 material_specular;
+	uniform float material_specular_power;
+	*/
 	
 	protected static final boolean useInterleaved = true;
 	protected boolean isInitialized = false;
@@ -122,6 +136,26 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
         //TODO
         lightPositionLocation = gl.glGetUniformLocation(shaderProgramId, "light_position");
         dummyLocation = gl.glGetUniformLocation(shaderProgramId, "dummy");
+        
+        material_ambientLocation = gl.glGetUniformLocation(shaderProgramId, "material_ambient");
+        material_diffuseLocation = gl.glGetUniformLocation(shaderProgramId, "material_diffuse");
+        material_specularLocation = gl.glGetUniformLocation(shaderProgramId, "material_specular");
+        material_specular_powerLocation = gl.glGetUniformLocation(shaderProgramId, "material_specular_power");
+//    	protected final FloatBuffer material_ambientBuffer = FloatBuffer.allocate(3);
+//    	protected int material_ambientLocation = -1;
+//    	protected final FloatBuffer material_diffuseBuffer = FloatBuffer.allocate(3);
+//    	protected int material_diffuseLocation = -1;
+//    	protected final FloatBuffer material_specularBuffer = FloatBuffer.allocate(3);
+//    	protected int material_specularLocation = -1;
+//    	protected final FloatBuffer material_specular_powerBuffer = FloatBuffer.allocate(1);
+//    	protected int material_specular_powerLocation = -1;
+//    	/*
+//    	uniform vec3 material_ambient;
+//    	uniform vec3 material_diffuse;
+//    	uniform vec3 material_specular;
+//    	uniform float material_specular_power;
+//    	*/
+        
 
         /* This block fails the program
         // light positioned at (10.f,10.f,10.f)
@@ -229,8 +263,40 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 	      dummyBuffer.clear();
 	      dummyBuffer.put(new float[] {0.f,0.f,1.f,1f});
 	      dummyBuffer.rewind();
-			gl.glUniform4fv(dummyLocation, 1, dummyBuffer);
+	      gl.glUniform4fv(dummyLocation, 1, dummyBuffer);
 
+			
+	      material_ambientBuffer.clear();
+	      material_ambientBuffer.put(new float[] {0.1f,0.f,0.2f});
+	      material_ambientBuffer.rewind();
+	      gl.glUniform3fv(material_ambientLocation, 1, material_ambientBuffer);
+
+	      material_diffuseBuffer.clear();
+	      material_diffuseBuffer.put(new float[] {0.3f,0.2f,0.8f});
+	      material_diffuseBuffer.rewind();
+	      gl.glUniform3fv(material_diffuseLocation, 1, material_diffuseBuffer);
+
+	      material_specularBuffer.clear();
+	      material_specularBuffer.put(new float[] {1f,1f,1f});
+	      material_specularBuffer.rewind();
+	      gl.glUniform3fv(material_specularLocation, 1,material_specularBuffer);
+
+	      material_specular_powerBuffer.clear();
+	      material_specular_powerBuffer.put(new float[] {3.0f});
+	      material_specular_powerBuffer.rewind();
+	      gl.glUniform1fv(material_specular_powerLocation, 1, material_specular_powerBuffer);
+
+//	    	protected final FloatBuffer material_specularBuffer = FloatBuffer.allocate(3);
+//	    	protected int material_specularLocation = -1;
+//	    	protected final FloatBuffer material_specular_powerBuffer = FloatBuffer.allocate(1);
+//	    	protected int material_specular_powerLocation = -1;
+//	    	/*
+//	    	uniform vec3 material_ambient;
+//	    	uniform vec3 material_diffuse;
+//	    	uniform vec3 material_specular;
+//	    	uniform float material_specular_power;
+//	    	*/
+			
 		
 		/* TODO CULL_FACE causes some problem, need fix, probably CCW issue in traingulation. 
 		gl.glEnable(GL4.GL_CULL_FACE);
