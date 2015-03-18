@@ -613,9 +613,9 @@ public class ExampleNormalLightMaterialGearOuterStripRenderer extends Renderer {
 				//normals[3+i*normalDimension] = 1.0f;
 				theta += step;
 			}
-			interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, totalVertices, GL.GL_STATIC_DRAW);
+			interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 3, GL.GL_FLOAT, false, totalVertices, GL.GL_STATIC_DRAW);
 	        interleavedVBO.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
-	        interleavedVBO.addGLSLSubArray("mgl_Normal",  4, GL.GL_ARRAY_BUFFER);
+	        interleavedVBO.addGLSLSubArray("mgl_Normal",  3, GL.GL_ARRAY_BUFFER);
 	
 	        FloatBuffer ib = (FloatBuffer)interleavedVBO.getBuffer();
 	
