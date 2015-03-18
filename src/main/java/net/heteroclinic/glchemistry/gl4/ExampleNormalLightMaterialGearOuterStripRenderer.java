@@ -23,6 +23,7 @@
  * TO-DO Material
  * TODO Compute normal
  * TODO Light-material shaders
+ * TODO Need check bunny's shaders.
  * 
  * References:
 1.The gear geometry data refer to 
@@ -62,13 +63,13 @@ import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
 import com.jogamp.opengl.util.glsl.ShaderState;
 
-public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
+public class ExampleNormalLightMaterialGearOuterStripRenderer extends Renderer {
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new BareBoneNewt(new ExampleLightMaterialGearOuterStripRenderer());
+				new BareBoneNewt(new ExampleNormalLightMaterialGearOuterStripRenderer());
 			}
 		});
 	}
@@ -199,7 +200,7 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 		this.view = view;
 	}
 
-	public ExampleLightMaterialGearOuterStripRenderer() {
+	public ExampleNormalLightMaterialGearOuterStripRenderer() {
 		//this.view = view;
 		initTransform();
 	}//			for (int i = 0; i<vertices.length; i++) {
@@ -424,6 +425,7 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 	
 	final static public int vertexDimension =3 ;
 	final static public int colorDimension =4 ;
+	final static public int normalDimension =3 ;
 	protected void initFanCircle_VBO_nonInterleaved(int VERTEX_COUNT, float r, GL4 gl) {
 		{
 			
@@ -600,22 +602,26 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 //				System.out.print(vertices[i]+ " ");
 //			}
 			
-			float [] colors = new float [totalVertices * colorDimension];
+			float [] normals = new float [totalVertices * normalDimension];
+			theta = 0f;
+			step = ((float)Math.PI )*2.f / totalVertices;
+					
 			for (int i = 0; i < totalVertices; i++) {
-				colors[0+i*colorDimension] = (i%3==1)?1.0f:0f ;
-				colors[1+i*colorDimension] = (i%3==2)?1.0f:0f ;
-				colors[2+i*colorDimension] = (i%3==0)?1.0f:0f ;
-				colors[3+i*colorDimension] = 1.0f;
+				normals[0+i*normalDimension] =   (float)Math.cos(theta);
+				normals[1+i*normalDimension] =  (float)Math.sin(theta);
+				normals[2+i*normalDimension] = 0.0f;
+				//normals[3+i*normalDimension] = 1.0f;
+				theta += step;
 			}
 			interleavedVBO = GLArrayDataServer.createGLSLInterleaved(3 + 4, GL.GL_FLOAT, false, totalVertices, GL.GL_STATIC_DRAW);
 	        interleavedVBO.addGLSLSubArray("mgl_Vertex", 3, GL.GL_ARRAY_BUFFER);
-	        interleavedVBO.addGLSLSubArray("mgl_Color",  4, GL.GL_ARRAY_BUFFER);
+	        interleavedVBO.addGLSLSubArray("mgl_Normal",  4, GL.GL_ARRAY_BUFFER);
 	
 	        FloatBuffer ib = (FloatBuffer)interleavedVBO.getBuffer();
 	
 	        for(int i = 0; i < totalVertices; i++) {
 	            ib.put(vertices,  i*3, 3);
-	            ib.put(colors,    i*4, 4);
+	            ib.put(normals,    i*3, 3);
 	        }
 	        interleavedVBO.seal(gl, true);
 	        interleavedVBO.enableBuffer(gl, false);
@@ -624,7 +630,7 @@ public class ExampleLightMaterialGearOuterStripRenderer extends Renderer {
 		}
 	}
 	
-	protected static final String shaderBasename = "lightedTriangles";
+	protected static final String shaderBasename = "normalLightedTriangles";
 	protected ShaderState st;
 	protected static final int NO_OF_INSTANCE = 1;
 	//protected final FloatBuffer triangleTransform = FloatBuffer.allocate(16 * NO_OF_INSTANCE);
