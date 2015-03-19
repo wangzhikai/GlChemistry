@@ -9,6 +9,7 @@ uniform mat4 mgl_PMatrix;
 uniform mat4 mgl_MVMatrix[NO_OF_INSTANCE];
 uniform vec3 light_position;
 uniform vec4 dummy;
+uniform vec3 eye_coord;
 
 uniform vec3 material_ambient;
 uniform vec3 material_diffuse;
@@ -27,8 +28,8 @@ void main(void) {
     vec3 R = reflect(-L, N);
 
     float diffuse = max(LdotN, 0.0);
-    //float specular = max(pow(dot(normalize(-fragment.eye_coord), R), material_specular_power), 0.0);
-    float specular = 0.2f;
+    float specular = max(pow(dot(normalize(-eye_coord), R), material_specular_power), 0.0);
+    //float specular = 0.2f;
 
     //float f = textureProj(depth_texture, fragment.shadow_coord);
     float f  = 1.0f;

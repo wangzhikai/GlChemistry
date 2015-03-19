@@ -95,6 +95,10 @@ public class ExampleNormalLightMaterialGearOuterStripRenderer extends Renderer {
 	protected int material_specularLocation = -1;
 	protected final FloatBuffer material_specular_powerBuffer = FloatBuffer.allocate(1);
 	protected int material_specular_powerLocation = -1;
+	protected final FloatBuffer eye_coordBuffer = FloatBuffer.allocate(3);
+	protected int eye_coordLocation = -1;
+	
+	//uniform vec3 eye_coord;
 	/*
 	uniform vec3 material_ambient;
 	uniform vec3 material_diffuse;
@@ -142,6 +146,9 @@ public class ExampleNormalLightMaterialGearOuterStripRenderer extends Renderer {
         material_diffuseLocation = gl.glGetUniformLocation(shaderProgramId, "material_diffuse");
         material_specularLocation = gl.glGetUniformLocation(shaderProgramId, "material_specular");
         material_specular_powerLocation = gl.glGetUniformLocation(shaderProgramId, "material_specular_power");
+        eye_coordLocation = gl.glGetUniformLocation(shaderProgramId, "eye_coord");
+//    	protected final FloatBuffer eye_coordBuffer = FloatBuffer.allocate(3);
+//    	protected int eye_coordLocation = -1;
 //    	protected final FloatBuffer material_ambientBuffer = FloatBuffer.allocate(3);
 //    	protected int material_ambientLocation = -1;
 //    	protected final FloatBuffer material_diffuseBuffer = FloatBuffer.allocate(3);
@@ -294,6 +301,16 @@ public class ExampleNormalLightMaterialGearOuterStripRenderer extends Renderer {
 	      material_specular_powerBuffer.put(new float[] {3.0f});
 	      material_specular_powerBuffer.rewind();
 	      gl.glUniform1fv(material_specular_powerLocation, 1, material_specular_powerBuffer);
+	      
+	      eye_coordBuffer.clear();
+	      eye_coordBuffer.put(eyePostion);
+	      eye_coordBuffer.rewind();
+	      gl.glUniform3fv(eye_coordLocation, 1, eye_coordBuffer);
+
+	      
+//	  	protected final FloatBuffer eye_coordBuffer = FloatBuffer.allocate(3);
+//		protected int eye_coordLocation = -1;
+
 
 //	    	protected final FloatBuffer material_specularBuffer = FloatBuffer.allocate(3);
 //	    	protected int material_specularLocation = -1;
@@ -400,9 +417,13 @@ public class ExampleNormalLightMaterialGearOuterStripRenderer extends Renderer {
 		projectionMatrix.glMatrixMode(GL2.GL_PROJECTION);
 		projectionMatrix.glLoadIdentity();
 		projectionMatrix.gluPerspective(45, aspect, 0.001f, 20f);
-		projectionMatrix.gluLookAt(0, 8, 8, 0, 0, 0, 0, 1, 0);
+		
+//	    public final void gluLookAt(final float eyex, final float eyey, final float eyez,
+//                final float centerx, final float centery, final float centerz,
+//                final float upx, final float upy, final float upz) {
+		projectionMatrix.gluLookAt(eyePostion[0], eyePostion[1], eyePostion[2], 0, 0, 0, 0, 1, 0);
 	}
-	
+	protected float [] eyePostion = new float [] {0, 8, 8};
 	protected GLArrayDataServer interleavedVBO;
 	protected GLArrayDataClient verticesVBO;
 	protected GLArrayDataClient colorsVBO;
