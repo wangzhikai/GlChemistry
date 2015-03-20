@@ -21,9 +21,8 @@
  * 
  * TO-DO Light
  * TO-DO Material
- * TODO Compute normal
- * TODO Light-material shaders
- * TODO Need check bunny's shaders.
+ * TODO Compute normal,//TODO The normal computation is wrong. Need check bunny's normal computation.
+ * TO-DO Light-material shaders
  * 
  * References:
 1.The gear geometry data refer to 
@@ -271,7 +270,7 @@ public class ExampleNormalLightMaterialGearOuterStripRenderer extends Renderer {
 		//public void glUniform3fv(int location, int count, FloatBuffer v);
         //light positioned at (10.f,10.f,10.f)
       lightPosition.clear();
-      lightPosition.put(new float[] {10.f,10.f,10.f});
+      lightPosition.put(new float[] {30.f,10.f,10.f});
       lightPosition.rewind();
 		gl.glUniform3fv(lightPositionLocation, 1, lightPosition);
 
@@ -423,7 +422,7 @@ public class ExampleNormalLightMaterialGearOuterStripRenderer extends Renderer {
 //                final float upx, final float upy, final float upz) {
 		projectionMatrix.gluLookAt(eyePostion[0], eyePostion[1], eyePostion[2], 0, 0, 0, 0, 1, 0);
 	}
-	protected float [] eyePostion = new float [] {0, 8, 8};
+	protected float [] eyePostion = new float [] {0, 6, 8};
 	protected GLArrayDataServer interleavedVBO;
 	protected GLArrayDataClient verticesVBO;
 	protected GLArrayDataClient colorsVBO;
@@ -626,7 +625,8 @@ public class ExampleNormalLightMaterialGearOuterStripRenderer extends Renderer {
 			float [] normals = new float [totalVertices * normalDimension];
 			theta = 0f;
 			step = ((float)Math.PI )*2.f / totalVertices;
-					
+				
+			//TODO The normal computation is wrong.
 			for (int i = 0; i < totalVertices; i++) {
 				normals[0+i*normalDimension] =   (float)Math.cos(theta);
 				normals[1+i*normalDimension] =  (float)Math.sin(theta);
